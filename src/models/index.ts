@@ -63,6 +63,7 @@ export function initModels(): void {
   Consultant.initialize(sequelize);
   Client.initialize(sequelize);
   Employee.initialize(sequelize);
+  Employee.associate(sequelize.models);
   SubscriptionPlan.initialize(sequelize);
   UserSubscription.initialize(sequelize);
   BillingInvoice.initialize(sequelize);
@@ -82,6 +83,7 @@ export function initModels(): void {
   Payslip.initialize(sequelize);
   PayrollRecord.initialize(sequelize);
   Otp.initialize(sequelize);
+  Otp.associate(sequelize.models);
 
   // Run associate() on each model, if defined
   Object.values(sequelize.models).forEach((model: any) => {

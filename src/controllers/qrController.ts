@@ -1,49 +1,46 @@
-// src/controllers/qrController.ts
 import { Request, Response } from 'express';
 import QRCode from 'qrcode';
-import { Consultant } from '../models/consultant';
-import { Client } from '../models/client';
+import * as qrService from '../services/qrService';
 
 const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL || 'http://localhost:3000';
 
+/**
+ * GET /api/qr/:consultantId
+ * - Creates & stores a code, then returns a QR PNG dataURL linking to your client app
+ */
 export const generateQRCode = async (req: Request, res: Response) => {
   try {
     const { consultantId } = req.params;
-    const consultant = await Consultant.findByPk(consultantId);
-    if (!consultant) {
-      return res.status(404).json({ message: 'Consultant not found' });
-    }
-
-    // The link your client app will handle to perform the linking flow
-    const link = `${CLIENT_BASE_URL}/link?consultantId=${consultantId}`;
+    // 1) Persist the code
+    const connector = await qrService.createQRConnector(consultantId);
+    // 2) Build deep-link URL your client app will handle
+    const link = `${CLIENT_BASE_URL}/link?connectorId=${connector.id}`;
     const qrDataUrl = await QRCode.toDataURL(link);
 
-    // Return as a base64 PNG data URL
-    return res.json({ qrDataUrl });
-  } catch (error) {
-    console.error('generateQRCode error:', error);
+    return res.json({
+      connectorId: connector.id,
+      code: connector.code,
+      expiresAt: connector.expiresAt,
+      qrDataUrl,
+    });
+  } catch (err) {
+    console.error('generateQRCode error:', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-export const linkClientToConsultant = async (req: Request, res: Response) => {
+/**
+ * POST /api/qr/validate
+ * Body: { connectorId, code }
+ * - Verifies code, marks used, and returns success
+ */
+export const validateQRCode = async (req: Request, res: Response) => {
   try {
-    const { consultantId, clientId } = req.body;
-    // Validate both exist
-    const consultant = await Consultant.findByPk(consultantId);
-    if (!consultant) {
-      return res.status(404).json({ message: 'Consultant not found' });
-    }
-    const client = await Client.findByPk(clientId);
-    if (!client) {
-      return res.status(404).json({ message: 'Client not found' });
-    }
-
-    // Associate
-    await client.update({ consultantId });
-    return res.json({ message: 'Client linked', client });
-  } catch (error) {
-    console.error('linkClientToConsultant error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    const { connectorId, code } = req.body;
+    await qrService.validateQRCode(connectorId, code);
+    return res.json({ message: 'QR code validated successfully' });
+  } catch (err: any) {
+    console.error('validateQRCode error:', err);
+    return res.status(400).json({ message: err.message || 'Invalid QR code' });
   }
 };

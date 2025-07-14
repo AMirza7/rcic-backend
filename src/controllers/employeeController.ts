@@ -1,62 +1,88 @@
-// src/controllers/employeeController.ts
-import { Request, Response } from 'express';
-import { Employee } from '../models/employee';
+// src/models/employee.ts
+import {
+  Model,
+  DataTypes,
+  Sequelize,
+  Optional
+} from 'sequelize';
 
-export const getAllEmployees = async (req: Request, res: Response) => {
-  try {
-    const employees = await Employee.findAll();
-    return res.json(employees);
-  } catch (error) {
-    console.error('getAllEmployees error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-};
+// 1. Full shape of the table
+export interface EmployeeAttributes {
+  id: string;
+  consultantId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  position?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-export const getEmployeeById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const emp = await Employee.findByPk(id);
-    if (!emp) return res.status(404).json({ message: 'Employee not found' });
-    return res.json(emp);
-  } catch (error) {
-    console.error('getEmployeeById error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-};
+// 2. Creation attrs: id is optional
+export interface EmployeeCreationAttributes
+  extends Optional<EmployeeAttributes, 'id'> {}
 
-export const createEmployee = async (req: Request, res: Response) => {
-  try {
-    const payload = req.body;
-    const newEmp = await Employee.create(payload);
-    return res.status(201).json(newEmp);
-  } catch (error) {
-    console.error('createEmployee error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-};
+export class Employee
+  extends Model<EmployeeAttributes, EmployeeCreationAttributes>
+  implements EmployeeAttributes
+{
+  public id!: string;
+  public consultantId!: string;
+  public firstName!: string;
+  public lastName!: string;
+  public email!: string;
+  public phone?: string;
+  public position?: string;
 
-export const updateEmployee = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const payload = req.body;
-    const [updated] = await Employee.update(payload, { where: { id } });
-    if (!updated) return res.status(404).json({ message: 'Employee not found' });
-    const updatedEmp = await Employee.findByPk(id);
-    return res.json(updatedEmp);
-  } catch (error) {
-    console.error('updateEmployee error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-};
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 
-export const deleteEmployee = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const deleted = await Employee.destroy({ where: { id } });
-    if (!deleted) return res.status(404).json({ message: 'Employee not found' });
-    return res.status(204).send();
-  } catch (error) {
-    console.error('deleteEmployee error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+  static initialize(sequelize: Sequelize) {
+    Employee.init(
+      {
+        id: {
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
+          primaryKey: true,
+        },
+        consultantId: {
+          type: DataTypes.UUID,
+          allowNull: false,
+          references: { model: 'Consultants', key: 'id' },
+          onDelete: 'CASCADE',
+        },
+        firstName: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        lastName: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        email: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          validate: { isEmail: true },
+        },
+        phone: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        position: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+      },
+      {
+        sequelize,
+        tableName: 'Employees',
+        timestamps: true,
+      }
+    );
   }
-};
+
+  static associate(models: any) {
+    Employee.belongsTo(models.Consultant, { foreignKey: 'consultantId', as: 'consultant' });
+  }
+}

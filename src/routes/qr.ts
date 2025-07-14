@@ -1,29 +1,32 @@
-// src/routes/qr.ts
 import { Router } from 'express';
-import { generateQRCode, linkClientToConsultant } from '../controllers/qrController';
+import {
+  generateQRCode,
+  validateQRCode,
+} from '../controllers/qrController';
+import { requireAuth } from '../middleware/authMiddleware';
 import { validateBody, validateParams } from '../middleware/validate';
 import { z } from 'zod';
-import { generateQrSchema, linkClientSchema } from '../schemas/qrSchemas';
+import { validateQrSchema } from '../schemas/qrSchemas';
 
 const router = Router();
 
-// UUID validation for :consultantId param
-const consultantIdParamSchema = z.object({
-  consultantId: z.string().uuid({ message: 'consultantId must be a valid UUID' }),
+// GET /api/qr/:consultantId → create/store code + return QR image
+const consultantIdParam = z.object({
+  consultantId: z.string().uuid({ message: 'consultantId must be UUID' }),
 });
-
-// GET /api/qr/:consultantId → returns { qrDataUrl }
 router.get(
   '/:consultantId',
-  validateParams(consultantIdParamSchema, 'params'),
+  requireAuth,
+  validateParams(consultantIdParam, 'params'),
   generateQRCode
 );
 
-// POST /api/qr/link → body: { consultantId, clientId }
+// POST /api/qr/validate → { connectorId, code }
 router.post(
-  '/link',
-  validateBody(linkClientSchema),
-  linkClientToConsultant
+  '/validate',
+  requireAuth,
+  validateBody(validateQrSchema),
+  validateQRCode
 );
 
 export default router;

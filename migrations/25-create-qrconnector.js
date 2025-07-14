@@ -1,30 +1,25 @@
-// migrations/XXXXXXXXXXXXXX-create-otps.js
 'use strict';
-/** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    // Ensure the uuid-ossp extension is available (Postgres)
+  up: async (queryInterface, Sequelize) => {
+    // ensure extension for UUIDs (Postgres)
     await queryInterface.sequelize.query(
       `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
     );
 
-    // Create the Otps table with the desired columns
-    await queryInterface.createTable('Otps', {
+    await queryInterface.createTable('QRConnectors', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal('uuid_generate_v4()'),
-        allowNull: false,
         primaryKey: true,
+        allowNull: false,
+        defaultValue: Sequelize.literal('uuid_generate_v4()'),
       },
-      userId: {
+      consultantId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'Users', key: 'id' },
+        references: { model: 'Consultants', key: 'id' },
         onDelete: 'CASCADE',
-      },
-      phoneNumber: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        field: 'consultantId',
       },
       code: {
         type: Sequelize.STRING(6),
@@ -33,6 +28,11 @@ module.exports = {
       expiresAt: {
         type: Sequelize.DATE,
         allowNull: false,
+      },
+      used: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,11 +43,11 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.fn('NOW'),
-      }
+      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Otps');
-  }
+  down: async (queryInterface) => {
+    await queryInterface.dropTable('QRConnectors');
+  },
 };

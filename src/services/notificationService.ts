@@ -9,7 +9,7 @@ interface EmailOptions {
   html?: string;
 }
 
-export class NotificationService {
+class NotificationService {
   private transporter: nodemailer.Transporter;
   private twilioClient?: Twilio.Twilio;
   private fromSmsNumber?: string;
@@ -19,15 +19,19 @@ export class NotificationService {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: +(process.env.SMTP_PORT || 587),
-      secure: !!process.env.SMTP_SECURE, // true for 465, false for other ports
+      secure: !!process.env.SMTP_SECURE,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
 
-    // SMS setup (Twilio), optional
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_FROM_NUMBER) {
+    // SMS setup (Twilio)
+    if (
+      process.env.TWILIO_ACCOUNT_SID &&
+      process.env.TWILIO_AUTH_TOKEN &&
+      process.env.TWILIO_FROM_NUMBER
+    ) {
       this.twilioClient = Twilio(
         process.env.TWILIO_ACCOUNT_SID,
         process.env.TWILIO_AUTH_TOKEN
@@ -48,7 +52,7 @@ export class NotificationService {
     return info;
   }
 
-  /** Send an SMS (if Twilio configured) */
+  /** Send an SMS */
   async sendSMS(to: string, body: string) {
     if (!this.twilioClient || !this.fromSmsNumber) {
       throw new Error('SMS provider not configured');
@@ -61,3 +65,6 @@ export class NotificationService {
     return msg;
   }
 }
+
+// Export a single shared instance
+export const notificationService = new NotificationService();

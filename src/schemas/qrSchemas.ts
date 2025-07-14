@@ -1,11 +1,13 @@
-// src/schemas/qrSchemas.ts
 import { z } from 'zod';
 
-export const generateQrSchema = z.object({
-  consultantId: z.string().uuid({ message: 'consultantId must be a valid UUID' }),
-});
+/** No body for GET; we rely on req.user.id + params if you choose */
+export const generateQrSchema = z.object({});
 
-export const linkClientSchema = z.object({
-  consultantId: z.string().uuid({ message: 'consultantId must be a valid UUID' }),
-  clientId:     z.string().uuid({ message: 'clientId must be a valid UUID' }),
+/** For POST /api/qr/validate */
+export const validateQrSchema = z.object({
+  connectorId: z.string().uuid({ message: 'Must be a valid UUID' }),
+  code: z
+    .string()
+    .length(6, { message: 'Code must be exactly 6 digits' })
+    .regex(/^\d+$/, { message: 'Code must be numeric' }),
 });

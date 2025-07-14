@@ -1,5 +1,5 @@
 // src/models/index.ts
-import { Sequelize } from 'sequelize';
+import { Sequelize, Options } from 'sequelize';
 import { User } from './user';
 import { AuthToken } from './authtoken';
 import { Consultant } from './consultant';
@@ -29,15 +29,29 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const env = process.env.NODE_ENV ?? 'development';
-const config = require('../../config/config.js')[env];
+// require returns `any`, so cast down to our Sequelize Options shape
+const config = (require('../../config/config.js')[env] as Partial<Options> & {
+  use_env_variable?: string;
+  username?: string;
+  password?: string;
+  database?: string;
+});
 
-export const sequelize = config.use_env_variable
-  ? new Sequelize(process.env[config.use_env_variable], config)
-  : new Sequelize(
-      config.database,
-      config.username,
-      config.password,
-      config
+export const sequelize: Sequelize = config.use_env_variable
+  ? // Case: a full DATABASE_URL is provided in env
+    new Sequelize(
+      // non-null assertion so TS knows this is a string
+      process.env[config.use_env_variable]! as string,
+      // cast config to Options
+      config as Options
+    )
+  : // Case: separate credentials in config
+    new Sequelize(
+      // these must be strings
+      config.database! as string,
+      config.username! as string,
+      config.password! as string,
+      config as Options
     );
 
 /**
@@ -77,8 +91,5 @@ export function initModels(): void {
   });
 }
 
-// Optionally, you can auto-initialize here:
-// initModels();
-
-// Export Sequelize class for convenience elsewhere
+// Export DataTypes for convenience elsewhere
 export { DataTypes } from 'sequelize';

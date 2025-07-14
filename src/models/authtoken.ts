@@ -1,4 +1,3 @@
-// src/models/authtoken.ts
 import {
   Model,
   DataTypes,
@@ -17,7 +16,7 @@ export interface AuthTokenAttributes {
   updatedAt?: Date;
 }
 
-// 2. Creation attributes (id is optional on creation)
+// 2. Creation attributes (id is optional)
 export interface AuthTokenCreationAttributes
   extends Optional<AuthTokenAttributes, 'id'> {}
 
@@ -35,12 +34,10 @@ export class AuthToken
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  // 4. Associations
   public static associate(models: any): void {
-    // e.g. this.belongsTo(models.User, { foreignKey: 'userId' });
+    this.belongsTo(models.User, { foreignKey: 'userId' });
   }
 
-  // 5. Initialization
   public static initialize(sequelize: Sequelize) {
     AuthToken.init(
       {
@@ -64,6 +61,8 @@ export class AuthToken
         userId: {
           type: DataTypes.UUID,
           allowNull: false,
+          references: { model: 'Users', key: 'id' },
+          onDelete: 'CASCADE',
         },
       },
       {

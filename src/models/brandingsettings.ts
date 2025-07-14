@@ -1,36 +1,126 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class BrandingSettings extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+// src/models/brandingsettings.ts
+import {
+  Model,
+  DataTypes,
+  Sequelize,
+  Optional
+} from 'sequelize';
+
+// 1. Attribute interface
+export interface BrandingSettingsAttributes {
+  id: string;
+  consultantId: string;
+  logo: string | null;
+  favicon: string | null;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string | null;
+  typography: string;
+  brandName: string | null;
+  customDomain: string | null;
+  customCSS: string | null;
+  isActive: boolean;
+  theme: any | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// 2. Creation attributes (id optional on create)
+export interface BrandingSettingsCreationAttributes
+  extends Optional<BrandingSettingsAttributes, 'id'> {}
+
+// 3. Model class
+export class BrandingSettings
+  extends Model<BrandingSettingsAttributes, BrandingSettingsCreationAttributes>
+  implements BrandingSettingsAttributes
+{
+  public id!: string;
+  public consultantId!: string;
+  public logo!: string | null;
+  public favicon!: string | null;
+  public primaryColor!: string;
+  public secondaryColor!: string;
+  public accentColor!: string | null;
+  public typography!: string;
+  public brandName!: string | null;
+  public customDomain!: string | null;
+  public customCSS!: string | null;
+  public isActive!: boolean;
+  public theme!: any | null;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  // 4. Define associations here
+  public static associate(models: any): void {
+    // e.g. this.belongsTo(models.Consultant, { foreignKey: 'consultantId' });
   }
-  BrandingSettings.init({
-    id: DataTypes.UUID,
-    consultantId: DataTypes.UUID,
-    logo: DataTypes.STRING,
-    favicon: DataTypes.STRING,
-    primaryColor: DataTypes.STRING,
-    secondaryColor: DataTypes.STRING,
-    accentColor: DataTypes.STRING,
-    typography: DataTypes.STRING,
-    brandName: DataTypes.STRING,
-    customDomain: DataTypes.STRING,
-    customCSS: DataTypes.TEXT,
-    updatedAt: DataTypes.DATE,
-    isActive: DataTypes.BOOLEAN,
-    theme: DataTypes.JSON
-  }, {
-    sequelize,
-    modelName: 'BrandingSettings',
-  });
-  return BrandingSettings;
-};
+
+  // 5. Initialize model
+  public static initialize(sequelize: Sequelize): void {
+    BrandingSettings.init(
+      {
+        id: {
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
+          primaryKey: true,
+        },
+        consultantId: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+        logo: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        favicon: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        primaryColor: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        secondaryColor: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        accentColor: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        typography: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        brandName: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        customDomain: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        customCSS: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+        },
+        isActive: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: true,
+        },
+        theme: {
+          type: DataTypes.JSON,
+          allowNull: true,
+        },
+      },
+      {
+        sequelize,
+        tableName: 'BrandingSettings',
+        modelName: 'BrandingSettings',
+        timestamps: true,
+      }
+    );
+  }
+}

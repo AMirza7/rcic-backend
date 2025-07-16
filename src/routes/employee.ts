@@ -1,12 +1,13 @@
 // src/routes/employee.ts
 import { Router } from 'express';
 import {
-  getAllEmployees,
-  getEmployeeById,
-  createEmployee,
-  updateEmployee,
-  deleteEmployee,
+  listEmployees,
+  getEmployee,
+  addEmployee,
+  editEmployee,
+  removeEmployee,
 } from '../controllers/employeeController';
+import { requireAuth } from '../middleware/authMiddleware';
 import { validateBody, validateParams } from '../middleware/validate';
 import { z } from 'zod';
 import {
@@ -21,31 +22,40 @@ const idParamSchema = z.object({
   id: z.string().uuid({ message: 'id must be a valid UUID' }),
 });
 
-router.get('/', getAllEmployees);
+// GET /api/employees
+router.get('/', requireAuth, listEmployees);
 
+// GET /api/employees/:id
 router.get(
   '/:id',
+  requireAuth,
   validateParams(idParamSchema, 'params'),
-  getEmployeeById
+  getEmployee
 );
 
+// POST /api/employees
 router.post(
   '/',
+  requireAuth,
   validateBody(createEmployeeSchema),
-  createEmployee
+  addEmployee
 );
 
+// PUT /api/employees/:id
 router.put(
   '/:id',
+  requireAuth,
   validateParams(idParamSchema, 'params'),
   validateBody(updateEmployeeSchema),
-  updateEmployee
+  editEmployee
 );
 
+// DELETE /api/employees/:id
 router.delete(
   '/:id',
+  requireAuth,
   validateParams(idParamSchema, 'params'),
-  deleteEmployee
+  removeEmployee
 );
 
 export default router;

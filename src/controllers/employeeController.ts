@@ -1,88 +1,67 @@
-// src/models/employee.ts
-import {
-  Model,
-  DataTypes,
-  Sequelize,
-  Optional
-} from 'sequelize';
+// src/controllers/employeeController.ts
+import { Request, Response } from 'express';
+import { Employee } from '../models/employee';
 
-// 1. Full shape of the table
-export interface EmployeeAttributes {
-  id: string;
-  consultantId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  position?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+/**
+ * GET /api/employees
+ */
+export async function listEmployees(req: Request, res: Response) {
+  try {
+    const employees = await Employee.findAll();
+    return res.json({ success: true, data: employees });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
 }
 
-// 2. Creation attrs: id is optional
-export interface EmployeeCreationAttributes
-  extends Optional<EmployeeAttributes, 'id'> {}
-
-export class Employee
-  extends Model<EmployeeAttributes, EmployeeCreationAttributes>
-  implements EmployeeAttributes
-{
-  public id!: string;
-  public consultantId!: string;
-  public firstName!: string;
-  public lastName!: string;
-  public email!: string;
-  public phone?: string;
-  public position?: string;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-
-  static initialize(sequelize: Sequelize) {
-    Employee.init(
-      {
-        id: {
-          type: DataTypes.UUID,
-          defaultValue: DataTypes.UUIDV4,
-          primaryKey: true,
-        },
-        consultantId: {
-          type: DataTypes.UUID,
-          allowNull: false,
-          references: { model: 'Consultants', key: 'id' },
-          onDelete: 'CASCADE',
-        },
-        firstName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        lastName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        email: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: { isEmail: true },
-        },
-        phone: {
-          type: DataTypes.STRING,
-          allowNull: true,
-        },
-        position: {
-          type: DataTypes.STRING,
-          allowNull: true,
-        },
-      },
-      {
-        sequelize,
-        tableName: 'Employees',
-        timestamps: true,
-      }
-    );
+/**
+ * GET /api/employees/:id
+ */
+export async function getEmployee(req: Request, res: Response) {
+  try {
+    const emp = await Employee.findByPk(req.params.id);
+    if (!emp) return res.status(404).json({ success: false, message: 'Not found' });
+    return res.json({ success: true, data: emp });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
   }
+}
 
-  static associate(models: any) {
-    Employee.belongsTo(models.Consultant, { foreignKey: 'consultantId', as: 'consultant' });
+/**
+ * POST /api/employees
+ */
+export async function addEmployee(req: Request, res: Response) {
+  try {
+    const emp = await Employee.create(req.body);
+    return res.status(201).json({ success: true, data: emp });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * PATCH /api/employees/:id
+ */
+export async function editEmployee(req: Request, res: Response) {
+  try {
+    const emp = await Employee.findByPk(req.params.id);
+    if (!emp) return res.status(404).json({ success: false, message: 'Not found' });
+    await emp.update(req.body);
+    return res.json({ success: true, data: emp });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * DELETE /api/employees/:id
+ */
+export async function removeEmployee(req: Request, res: Response) {
+  try {
+    const deleted = await Employee.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ success: false, message: 'Not found' });
+    return res.json({ success: true, message: 'Deleted' });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
   }
 }

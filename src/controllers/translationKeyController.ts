@@ -1,3 +1,4 @@
+// src/controllers/translationKeyController.ts
 import { Request, Response } from 'express';
 import { TranslationKey, TranslationKeyAttributes } from '../models/translationkey';
 
@@ -19,10 +20,10 @@ export async function createTranslationKey(req: Request, res: Response) {
  */
 export async function listTranslationKeys(req: Request, res: Response) {
   try {
-    // build a typed where object, defaulting to empty object
+    // Build a typed `where` object; default to an empty filter
     const where: Partial<TranslationKeyAttributes> = {};
-    if (req.query.locale) {
-      where.locale = String(req.query.locale);
+    if (typeof req.query.locale === 'string' && req.query.locale.trim() !== '') {
+      where.locale = req.query.locale;
     }
 
     const items = await TranslationKey.findAll({ where });
@@ -38,7 +39,11 @@ export async function listTranslationKeys(req: Request, res: Response) {
 export async function getTranslationKey(req: Request, res: Response) {
   try {
     const tk = await TranslationKey.findByPk(req.params.id);
-    if (!tk) return res.status(404).json({ success: false, message: 'Not found' });
+    if (!tk) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Translation key not found' });
+    }
     return res.json({ success: true, data: tk });
   } catch (err: any) {
     return res.status(500).json({ success: false, error: err.message });
@@ -51,7 +56,11 @@ export async function getTranslationKey(req: Request, res: Response) {
 export async function updateTranslationKey(req: Request, res: Response) {
   try {
     const tk = await TranslationKey.findByPk(req.params.id);
-    if (!tk) return res.status(404).json({ success: false, message: 'Not found' });
+    if (!tk) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Translation key not found' });
+    }
     await tk.update(req.body);
     return res.json({ success: true, data: tk });
   } catch (err: any) {
@@ -64,9 +73,15 @@ export async function updateTranslationKey(req: Request, res: Response) {
  */
 export async function deleteTranslationKey(req: Request, res: Response) {
   try {
-    const deleted = await TranslationKey.destroy({ where: { id: req.params.id } });
-    if (!deleted) return res.status(404).json({ success: false, message: 'Not found' });
-    return res.json({ success: true, message: 'Deleted' });
+    const deleted = await TranslationKey.destroy({
+      where: { id: req.params.id },
+    });
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Translation key not found' });
+    }
+    return res.json({ success: true, message: 'Translation key deleted' });
   } catch (err: any) {
     return res.status(500).json({ success: false, error: err.message });
   }

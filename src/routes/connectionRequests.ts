@@ -1,3 +1,4 @@
+// src/routes/connectionRequests.ts
 import { Router } from 'express';
 import {
   createConnectionRequest,
@@ -7,13 +8,54 @@ import {
   deleteConnectionRequest
 } from '../controllers/connectionRequestController';
 import { requireAuth } from '../middleware/authMiddleware';
+import { validateBody, validateParams } from '../middleware/validate';
+import { z } from 'zod';
+import {
+  createConnectionRequestSchema,
+  updateConnectionRequestSchema
+} from '../schemas/connectionRequestSchemas';
 
 const router = Router();
 
-router.post('/', requireAuth, createConnectionRequest);
+// UUID validation for :id param
+const idParamSchema = z.object({
+  id: z.string().uuid({ message: 'id must be a valid UUID' })
+});
+
+// POST /api/connection-requests
+router.post(
+  '/',
+  requireAuth,
+  validateBody(createConnectionRequestSchema),
+  createConnectionRequest
+);
+
+// GET /api/connection-requests
 router.get('/', requireAuth, listConnectionRequests);
-router.get('/:id', requireAuth, getConnectionRequestById);
-router.patch('/:id', requireAuth, updateConnectionRequestStatus);
-router.delete('/:id', requireAuth, deleteConnectionRequest);
+
+// GET /api/connection-requests/:id
+router.get(
+  '/:id',
+  requireAuth,
+  validateParams(idParamSchema, 'params'),
+  getConnectionRequestById
+);
+
+// PATCH /api/connection-requests/:id
+router.patch(
+  '/:id',
+  requireAuth,
+  validateParams(idParamSchema, 'params'),
+  validateBody(updateConnectionRequestSchema),
+  updateConnectionRequestStatus
+);
+
+// DELETE /api/connection-requests/:id
+router.delete(
+  '/:id',
+  requireAuth,
+  validateParams(idParamSchema, 'params'),
+  deleteConnectionRequest
+);
 
 export default router;

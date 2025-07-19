@@ -19,11 +19,23 @@ import { LocaleConfig } from './localeconfig';
 import { Document } from './document';
 import { DocumentFolder } from './documentfolder';
 import { DocumentPermission } from './documentpermission';
+import { WithdrawalRequest } from './WithdrawalRequest';
 import { Appointment } from './appointment';
 import { AppointmentFeedback } from './appointmentfeedback';
+import { Timesheet } from './Timesheet';
+import { DashboardWidget } from './DashboardWidget';
+import { Integration } from './Integration';
+import { BankAccount } from './BankAccount';
+import { PaymentProcessor } from './PaymentProcessor';
+import { TimeEntry } from './TimeEntry';
 import { Template } from './template';
+import { Calendar } from './Calendar';
+import { CalendarEvent } from './CalendarEvent';
+import { TaskWorkflow } from './TaskWorkflow';
+import { WorkflowStep } from './WorkflowStep';
 import { CartItem } from './cartitem';
 import { TemplateReview } from './templatereview';
+import { SecurityEvent } from './SecurityEvent';
 import { ShoppingCart } from './shoppingcart';
 import { PayrollRun } from './payrollrun';
 import { Payslip } from './payslip';
@@ -33,6 +45,7 @@ import { InvoiceItem } from './invoiceitem';
 import { ConnectionRequest } from './connectionrequest';
 import { AuditLog } from './auditlog';
 import { Otp } from './otp';
+import { ReferralData } from './ReferralData';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -73,18 +86,30 @@ export function initModels(): void {
   Notification.initialize(sequelize);
   FeatureAnnouncement.initialize(sequelize);
   FeatureFlag.initialize(sequelize);
+  BankAccount.initialize(sequelize);
+  PaymentProcessor.initialize(sequelize);
   BrandingSettings.initialize(sequelize);
+  SecurityEvent.initialize(sequelize);
   Content.initialize(sequelize);
   Document.initialize(sequelize);
+  TaskWorkflow.initialize(sequelize);
+  WorkflowStep.initialize(sequelize);
   DocumentFolder.initialize(sequelize);
   DocumentPermission.initialize(sequelize);
+  Timesheet.initialize(sequelize);
+  TimeEntry.initialize(sequelize);  
+  Calendar.initialize(sequelize);
+  CalendarEvent.initialize(sequelize);
   Appointment.initialize(sequelize);
   AppointmentFeedback.initialize(sequelize);
+  DashboardWidget.initialize(sequelize);
+  Integration.initialize(sequelize);
   Template.initialize(sequelize);
   TemplateReview.initialize(sequelize);
   ShoppingCart.initialize(sequelize);
   CartItem.initialize(sequelize);
   PayrollRun.initialize(sequelize);
+  WithdrawalRequest.initialize(sequelize);
   Payslip.initialize(sequelize);
   BillingInvoice.initialize(sequelize);
   InvoiceItem.initialize(sequelize);
@@ -93,6 +118,16 @@ export function initModels(): void {
   Otp.initialize(sequelize);
   Otp.associate(sequelize.models);
   AuditLog.initialize(sequelize);
+  ReferralData.initialize(sequelize);
+
+
+  // generic associate loop…
+  Timesheet.associate(sequelize.models);
+  TimeEntry.associate(sequelize.models);
+  Calendar.associate(sequelize.models);
+  CalendarEvent.associate(sequelize.models);
+  DashboardWidget.associate(sequelize.models);
+  Integration.associate(sequelize.models);
 
   // Run associate() on each model, if defined
   Object.values(sequelize.models).forEach((model: any) => {

@@ -76,11 +76,20 @@ module.exports = {
         allowNull: false,
         defaultValue: true,
       },
+
+      // ——— Core tier/status
       tier: {
-        type: Sequelize.ENUM('basic', 'premium', 'enterprise'),
+        type: Sequelize.ENUM(
+          'basic',
+          'premium',
+          'enterprise',
+          'professional',
+          'platinum'
+        ),
         allowNull: false,
         defaultValue: 'basic',
       },
+
       pricing: {
         type: Sequelize.JSONB,
         allowNull: false,
@@ -116,6 +125,31 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
+
+      // ——— Fusion‑AI additions
+      services: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
+      videoUrl: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      featured: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      urgent: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      promotionEndDate: {
+        type: Sequelize.DATEONLY,
+        allowNull: true,
+      },
+
       variants: {
         type: Sequelize.JSONB,
         allowNull: true,
@@ -125,6 +159,8 @@ module.exports = {
         allowNull: true,
         defaultValue: {},
       },
+
+      // ——— Timestamps
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

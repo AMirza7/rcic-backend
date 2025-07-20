@@ -1,11 +1,19 @@
 // src/server.ts
-import dotenv from 'dotenv';
-dotenv.config();
-
 import app from './app';
-import { sequelize, initModels } from './models';
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 5100;
+const port = Number(process.env.PORT) || 5100;
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+
+// import dotenv from 'dotenv';
+// dotenv.config();
+
+// import app from './app';
+// import { sequelize, initModels } from './models';
+
+// const PORT = process.env.PORT ? Number(process.env.PORT) : 5100;
 
 // async function start() {
 //   try {

@@ -15,6 +15,7 @@ import { BrandingSettings } from './brandingsettings';
 import { Content } from './content';
 import { StorageUsage } from './storageusage';
 import { FileUploadConfig } from './fileuploadconfig';
+import { ReferralStats } from './ReferralStats';
 import { LocaleConfig } from './localeconfig';
 import { Document } from './document';
 import { DocumentFolder } from './documentfolder';
@@ -119,6 +120,9 @@ export function initModels(): void {
   Otp.associate(sequelize.models);
   AuditLog.initialize(sequelize);
   ReferralData.initialize(sequelize);
+  ReferralStats.initialize(sequelize);
+
+  
 
 
   // generic associate loop…
@@ -128,6 +132,7 @@ export function initModels(): void {
   CalendarEvent.associate(sequelize.models);
   DashboardWidget.associate(sequelize.models);
   Integration.associate(sequelize.models);
+  ReferralStats.associate(sequelize.models);
 
   // Run associate() on each model, if defined
   Object.values(sequelize.models).forEach((model: any) => {

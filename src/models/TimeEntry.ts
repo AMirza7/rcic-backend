@@ -1,25 +1,35 @@
-// src/models/TimeEntry.ts
-import { Model, DataTypes, Optional, Sequelize } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  Sequelize,
+  Optional
+} from 'sequelize';
+import { Consultant } from './consultant';
+import { Client } from './client';
+import { User } from './user';
 
 export interface TimeEntryAttributes {
   id: string;
-  timesheetId: string;
+  employeeId: string;
+  consultantId: string;
   date: Date;
-  startTime: string;
-  endTime: string;
-  breakDuration: number;
-  hoursWorked: number;
-  entryType: 'regular' | 'overtime' | 'vacation' | 'sick' | 'holiday' | 'training';
-  taskDescription?: string;
-  clientId?: string;
-  projectId?: string;
-  billable: boolean;
-  hourlyRate?: number;
-  location: 'office' | 'remote' | 'client_site' | 'other';
-  approved: boolean;
+  startTime: Date;
+  endTime: Date;
+  totalHours: number;
+  clientName: string;
+  projectType: string;
+  taskCategory: string;
+  description: string;
   notes?: string;
-  gpsLocation?: { latitude: number; longitude: number; accuracy: number };
-  deviceInfo?: { ip: string; userAgent: string };
+  status: 'submitted' | 'approved' | 'rejected' | 'consultant_approved';
+  rejectionReason?: string;
+  hourlyRate: number;
+  totalAmount: number;
+  submittedAt: Date;
+  consultantReviewedAt?: Date;
+  adminReviewedAt?: Date;
+  payrollStatus: 'pending' | 'processed' | 'paid';
+  payrollBatch?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -28,13 +38,11 @@ export interface TimeEntryCreationAttributes
   extends Optional<
     TimeEntryAttributes,
     | 'id'
-    | 'taskDescription'
-    | 'clientId'
-    | 'projectId'
-    | 'hourlyRate'
     | 'notes'
-    | 'gpsLocation'
-    | 'deviceInfo'
+    | 'rejectionReason'
+    | 'consultantReviewedAt'
+    | 'adminReviewedAt'
+    | 'payrollBatch'
     | 'createdAt'
     | 'updatedAt'
   > {}
@@ -43,29 +51,31 @@ export class TimeEntry
   extends Model<TimeEntryAttributes, TimeEntryCreationAttributes>
   implements TimeEntryAttributes {
   public id!: string;
-  public timesheetId!: string;
+  public employeeId!: string;
+  public consultantId!: string;
   public date!: Date;
-  public startTime!: string;
-  public endTime!: string;
-  public breakDuration!: number;
-  public hoursWorked!: number;
-  public entryType!: TimeEntryAttributes['entryType'];
-  public taskDescription?: string;
-  public clientId?: string;
-  public projectId?: string;
-  public billable!: boolean;
-  public hourlyRate?: number;
-  public location!: TimeEntryAttributes['location'];
-  public approved!: boolean;
+  public startTime!: Date;
+  public endTime!: Date;
+  public totalHours!: number;
+  public clientName!: string;
+  public projectType!: string;
+  public taskCategory!: string;
+  public description!: string;
   public notes?: string;
-  public gpsLocation?: { latitude: number; longitude: number; accuracy: number };
-  public deviceInfo?: { ip: string; userAgent: string };
+  public status!: TimeEntryAttributes['status'];
+  public rejectionReason?: string;
+  public hourlyRate!: number;
+  public totalAmount!: number;
+  public submittedAt!: Date;
+  public consultantReviewedAt?: Date;
+  public adminReviewedAt?: Date;
+  public payrollStatus!: TimeEntryAttributes['payrollStatus'];
+  public payrollBatch?: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  /** Called by src/models/index.ts */
-  public static initialize(sequelize: Sequelize) {
+  static initialize(sequelize: Sequelize) {
     TimeEntry.init(
       {
         id: {
@@ -73,90 +83,108 @@ export class TimeEntry
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true
         },
-        timesheetId: {
+        employeeId: {
           type: DataTypes.UUID,
           allowNull: false,
-          references: { model: 'Timesheets', key: 'id' },
-          onDelete: 'CASCADE'
+          references: { model: 'Users', key: 'id' }
+        },
+        consultantId: {
+          type: DataTypes.UUID,
+          allowNull: false,
+          references: { model: 'Users', key: 'id' }
         },
         date: {
-          type: DataTypes.DATE,
+          type: DataTypes.DATEONLY,
           allowNull: false
         },
         startTime: {
-          type: DataTypes.STRING,
+          type: DataTypes.TIME,
           allowNull: false
         },
         endTime: {
-          type: DataTypes.STRING,
+          type: DataTypes.TIME,
           allowNull: false
         },
-        breakDuration: {
-          type: DataTypes.INTEGER,
-          allowNull: false
-        },
-        hoursWorked: {
-          type: DataTypes.FLOAT,
-          allowNull: false
-        },
-        entryType: {
-          type: DataTypes.ENUM('regular','overtime','vacation','sick','holiday','training'),
-          allowNull: false
-        },
-        taskDescription: {
-          type: DataTypes.TEXT,
-          allowNull: true
-        },
-        clientId: {
-          type: DataTypes.UUID,
-          allowNull: true,
-          references: { model: 'Clients', key: 'id' },
-          onDelete: 'SET NULL'
-        },
-        projectId: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        billable: {
-          type: DataTypes.BOOLEAN,
-          allowNull: false
-        },
-        hourlyRate: {
+        totalHours: {
           type: DataTypes.DECIMAL,
-          allowNull: true
-        },
-        location: {
-          type: DataTypes.ENUM('office','remote','client_site','other'),
           allowNull: false
         },
-        approved: {
-          type: DataTypes.BOOLEAN,
+        clientName: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        projectType: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        taskCategory: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        description: {
+          type: DataTypes.TEXT,
           allowNull: false
         },
         notes: {
           type: DataTypes.TEXT,
           allowNull: true
         },
-        gpsLocation: {
-          type: DataTypes.JSONB,
+        status: {
+          type: DataTypes.ENUM(
+            'submitted',
+            'approved',
+            'rejected',
+            'consultant_approved'
+          ),
+          allowNull: false,
+          defaultValue: 'submitted'
+        },
+        rejectionReason: {
+          type: DataTypes.TEXT,
           allowNull: true
         },
-        deviceInfo: {
-          type: DataTypes.JSONB,
+        hourlyRate: {
+          type: DataTypes.DECIMAL,
+          allowNull: false
+        },
+        totalAmount: {
+          type: DataTypes.DECIMAL,
+          allowNull: false
+        },
+        submittedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: DataTypes.NOW
+        },
+        consultantReviewedAt: {
+          type: DataTypes.DATE,
+          allowNull: true
+        },
+        adminReviewedAt: {
+          type: DataTypes.DATE,
+          allowNull: true
+        },
+        payrollStatus: {
+          type: DataTypes.ENUM('pending', 'processed', 'paid'),
+          allowNull: false,
+          defaultValue: 'pending'
+        },
+        payrollBatch: {
+          type: DataTypes.STRING,
           allowNull: true
         }
       },
       {
         sequelize,
-        tableName: 'TimeEntries'
+        tableName: 'TimeEntries',
+        timestamps: true
       }
     );
   }
 
-  public static associate(models: any) {
-    TimeEntry.belongsTo(models.Timesheet, {
-      foreignKey: 'timesheetId',
-      as: 'timesheet'
-    });
+  static associate(models: any) {
+    TimeEntry.belongsTo(models.User, { foreignKey: 'employeeId', as: 'employee' });
+    TimeEntry.belongsTo(models.User, { foreignKey: 'consultantId', as: 'consultant' });
+    // other associations…
   }
 }

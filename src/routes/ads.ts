@@ -39,21 +39,18 @@ const router = Router();
 router.use(requireAuth);
 
 // now return an Express.RequestHandler
-function validate(schema: ZodTypeAny): RequestHandler {
+export function validate(schema: ZodTypeAny): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      // send the response and then exit the handler
-      res.status(400).json({
-        message: 'Validation error',
-        details: result.error.format()
-      });
+      res.status(400).json({ message: 'Validation error', details: result.error.format() });
       return;
     }
-    req.body = result.data; // validated & typed
+    req.body = result.data;
     next();
   };
 }
+
 
 router.post('/', validate(adCreateSchema), createAd);
 router.get('/', listAds);

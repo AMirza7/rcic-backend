@@ -1,12 +1,17 @@
 // src/types/express/index.d.ts
-import 'express';
-import { UserAttributes } from '../../models/user';
+export {}; // make this an ES module so `declare global` works
 
-// only these two properties travel on req.user
-export type AuthUser = Pick<UserAttributes, 'id' | 'role'>;
+/**
+ * AuthUser is the subset of your UserAttributes you put on req.user
+ * we pull it in via an import-type so TS stays happy.
+ */
+type AuthUser = Pick<import('../../models/user').UserAttributes, 'id' | 'role'>;
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user: AuthUser;
+declare global {
+  namespace Express {
+    interface Request {
+      /** set by your authMiddleware */
+      user: AuthUser;
+    }
   }
 }

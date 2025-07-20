@@ -1,12 +1,12 @@
 // src/middleware/validate.ts
-import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { ZodSchema, ZodError, ZodTypeAny } from 'zod';
 
 /**
  * validateBody
  * Parses and validates req.body against the provided Zod schema.
  */
-export const validateBody = (schema: ZodSchema<any>) => {
+export const validateBody = (schema: ZodSchema<any>): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       req.body = schema.parse(req.body);
@@ -32,7 +32,10 @@ export const validateBody = (schema: ZodSchema<any>) => {
  * @param schema - Zod schema to validate against
  * @param key - 'params' or 'query'
  */
-export const validateParams = (schema: ZodSchema<any>, key: 'params' | 'query') => {
+export const validateParams = (
+  schema: ZodSchema<any>,
+  key: 'params' | 'query'
+): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       // @ts-ignore
@@ -53,19 +56,41 @@ export const validateParams = (schema: ZodSchema<any>, key: 'params' | 'query') 
   };
 };
 
-
 /**
+ * validateQuery
  * Validate `req.query` against a Zod schema.
  */
-export function validateQuery<T>(schema: ZodSchema<T>, key: 'query') {
+export function validateQuery<T>(
+  schema: ZodSchema<T>,
+  key: 'query'
+): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.query)
+    const result = schema.safeParse(req.query);
     if (!result.success) {
       return res
         .status(400)
-        .json({ success: false, errors: result.error.flatten().fieldErrors })
+        .json({ success: false, errors: result.error.flatten().fieldErrors });
     }
-    req.query = result.data as any
-    next()
-  }
+    req.query = result.data as any;
+    next();
+  };
+}
+
+/**
+ * validate
+ * Generic validator for req.body using any Zod schema.
+ */
+export function validate(schema: ZodTypeAny): RequestHandler {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body);
+    if (!result.success) {
+      res.status(400).json({
+        message: 'Validation error',
+        details: result.error.format(),
+      });
+      return;
+    }
+    req.body = result.data;
+    next();
+  };
 }

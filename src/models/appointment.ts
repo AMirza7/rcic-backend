@@ -1,4 +1,3 @@
-// src/models/appointment.ts
 import {
   Model,
   DataTypes,
@@ -12,30 +11,46 @@ export interface AppointmentAttributes {
   consultantId: string;
   clientId: string;
   title: string;
-  description: string;
-  type: string;
+  description?: string;
+  type: 'walk-in' | 'advance';
   status: string;
   startTime: Date;
   endTime: Date;
   duration: number;
-  location: string;
-  meetingUrl: string;
+  location?: string;
+  meetingUrl?: string;
   isVirtual: boolean;
   priority: string;
-  amount: number;
-  currency: string;
-  paymentStatus: string;
-  notes: string;
+  amount?: number;
+  currency?: string;
+  paymentStatus?: string;
+  notes?: string;
   reminderSent: boolean;
-  attendees: any;
-  documents: any;
+  attendees?: any;
+  documents?: any;
+  consultantName: string;
+  clientEmail: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-// 2. Creation attributes (id is optional on create)
+// 2. Creation attributes (id & optional fields)
 export interface AppointmentCreationAttributes
-  extends Optional<AppointmentAttributes, 'id'> {}
+  extends Optional<
+    AppointmentAttributes,
+    | 'id'
+    | 'description'
+    | 'location'
+    | 'meetingUrl'
+    | 'amount'
+    | 'currency'
+    | 'paymentStatus'
+    | 'notes'
+    | 'attendees'
+    | 'documents'
+    | 'createdAt'
+    | 'updatedAt'
+  > {}
 
 // 3. Model class
 export class Appointment
@@ -46,31 +61,33 @@ export class Appointment
   public consultantId!: string;
   public clientId!: string;
   public title!: string;
-  public description!: string;
-  public type!: string;
+  public description?: string;
+  public type!: 'walk-in' | 'advance';
   public status!: string;
   public startTime!: Date;
   public endTime!: Date;
   public duration!: number;
-  public location!: string;
-  public meetingUrl!: string;
+  public location?: string;
+  public meetingUrl?: string;
   public isVirtual!: boolean;
   public priority!: string;
-  public amount!: number;
-  public currency!: string;
-  public paymentStatus!: string;
-  public notes!: string;
+  public amount?: number;
+  public currency?: string;
+  public paymentStatus?: string;
+  public notes?: string;
   public reminderSent!: boolean;
-  public attendees!: any;
-  public documents!: any;
+  public attendees?: any;
+  public documents?: any;
+  public consultantName!: string;
+  public clientEmail!: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
   // 4. Associations
   public static associate(models: any): void {
-    // e.g. this.belongsTo(models.Consultant, { foreignKey: 'consultantId' });
-    // this.belongsTo(models.Client, { foreignKey: 'clientId' });
+    Appointment.belongsTo(models.Consultant, { foreignKey: 'consultantId', as: 'consultant' });
+    Appointment.belongsTo(models.Client, { foreignKey: 'clientId', as: 'client' });
   }
 
   // 5. Initialization
@@ -99,8 +116,9 @@ export class Appointment
           allowNull: true,
         },
         type: {
-          type: DataTypes.STRING,
+          type: DataTypes.ENUM('walk-in', 'advance'),
           allowNull: false,
+          defaultValue: 'advance'
         },
         status: {
           type: DataTypes.STRING,
@@ -156,13 +174,21 @@ export class Appointment
           defaultValue: false,
         },
         attendees: {
-          type: DataTypes.JSON,
+          type: DataTypes.JSONB,
           allowNull: true,
         },
         documents: {
-          type: DataTypes.JSON,
+          type: DataTypes.JSONB,
           allowNull: true,
         },
+        consultantName: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        clientEmail: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        }
       },
       {
         sequelize,

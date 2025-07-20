@@ -3,77 +3,118 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Documents', {
+      // Primary key as UUID
       id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
       },
-      id: {
-        type: Sequelize.UUID
-      },
+
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       fileName: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       fileUrl: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       fileSize: {
-        type: Sequelize.BIGINT
+        type: Sequelize.BIGINT,
+        allowNull: false,
       },
       mimeType: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       uploadDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
+
+      // Foreign key to Users (uploader)
       uploadedBy: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
+
       category: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       tags: {
-        type: Sequelize.JSON
+        type: Sequelize.JSONB,
+        allowNull: true,
       },
+
+      // Foreign key to Clients
       clientId: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { model: 'Clients', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
+
+      // Foreign key to Consultants
       consultantId: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { model: 'Consultants', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
+
       isPublic: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       expiryDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'active',
       },
       version: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
       },
       permissions: {
-        type: Sequelize.JSON
+        type: Sequelize.JSONB,
+        allowNull: true,
       },
       metadata: {
-        type: Sequelize.JSON
+        type: Sequelize.JSONB,
+        allowNull: true,
       },
+
       createdAt: {
+        type: Sequelize.DATE,
         allowNull: false,
-        type: Sequelize.DATE
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
+        type: Sequelize.DATE,
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Documents');
-  }
+  },
 };

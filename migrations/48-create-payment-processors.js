@@ -1,4 +1,3 @@
-// migrations/20250719000010-create-payment-processors.js
 'use strict';
 
 module.exports = {
@@ -7,47 +6,56 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       provider: {
-        type: Sequelize.ENUM('stripe','paypal','other'),
-        allowNull: false
+        type: Sequelize.ENUM('stripe', 'paypal', 'other'),
+        allowNull: false,
       },
       credentials: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       enabled: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
       settings: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
+
+      // Standard timestamps
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
   async down(queryInterface) {
+    // Drop the table
     await queryInterface.dropTable('PaymentProcessors');
-  }
+
+    // Clean up the provider enum type
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_PaymentProcessors_provider";'
+    );
+  },
 };

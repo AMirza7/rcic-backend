@@ -1,4 +1,3 @@
-// migrations/20250719000007-create-calendars.js
 'use strict';
 
 module.exports = {
@@ -7,53 +6,54 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       consultantId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Consultants', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       description: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       timezone: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       externalId: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       syncEnabled: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       syncSettings: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Calendars');
-  }
+  },
 };

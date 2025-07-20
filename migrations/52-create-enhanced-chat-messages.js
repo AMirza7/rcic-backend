@@ -2,12 +2,16 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('BankAccounts', {
+    await queryInterface.createTable('EnhancedChatMessages', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
+      },
+      sessionId: {
+        type: Sequelize.UUID,
+        allowNull: false,
       },
       userId: {
         type: Sequelize.UUID,
@@ -15,54 +19,36 @@ module.exports = {
         references: { model: 'Users', key: 'id' },
         onDelete: 'CASCADE',
       },
-      accountHolderName: {
-        type: Sequelize.STRING,
+      role: {
+        type: Sequelize.ENUM('user', 'assistant'),
         allowNull: false,
       },
-      accountNumber: {
-        type: Sequelize.STRING,
+      content: {
+        type: Sequelize.TEXT,
         allowNull: false,
       },
-      routingNumber: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      bankName: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      accountType: {
-        type: Sequelize.ENUM('checking', 'savings', 'other'),
-        allowNull: false,
-        defaultValue: 'checking',
-      },
-      currency: {
-        type: Sequelize.STRING(3),
-        allowNull: false,
-      },
-      isVerified: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      verifiedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      limits: {
+      sources: {
         type: Sequelize.JSONB,
-        allowNull: true,
+        allowNull: false,
       },
-      fees: {
+      attachments: {
         type: Sequelize.JSONB,
-        allowNull: true,
+        allowNull: false,
+      },
+      actions: {
+        type: Sequelize.JSONB,
+        allowNull: false,
+      },
+      sentiment: {
+        type: Sequelize.ENUM('positive', 'neutral', 'negative'),
+        allowNull: false,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true,
+        allowNull: false,
       },
 
-      // Standard timestamps
+      // Timestamps
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -77,11 +63,14 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('BankAccounts');
+    await queryInterface.dropTable('EnhancedChatMessages');
 
-    // Clean up the enum type for accountType
+    // Clean up Postgres enum types
     await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_BankAccounts_accountType";'
+      'DROP TYPE IF EXISTS "enum_EnhancedChatMessages_role";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_EnhancedChatMessages_sentiment";'
     );
   },
 };

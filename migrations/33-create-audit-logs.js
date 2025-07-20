@@ -2,52 +2,61 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+    // Use pgcrypto for gen_random_uuid()
+    await queryInterface.sequelize.query(
+      `CREATE EXTENSION IF NOT EXISTS "pgcrypto";`
+    );
 
     await queryInterface.createTable('AuditLogs', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
       },
       action: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       entity: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       entityId: {
         type: Sequelize.UUID,
-        allowNull: false
+        allowNull: false,
       },
       changes: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       userId: {
         type: Sequelize.UUID,
         allowNull: true,
         references: { model: 'Users', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
+        onDelete: 'SET NULL',
       },
+
+      // Timestamps
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // Drop the table
     await queryInterface.dropTable('AuditLogs');
-  }
+
+    // No custom ENUM types to drop for AuditLogs, but kept here for future-proofing
+    // e.g. await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_AuditLogs_xyz";');
+  },
 };

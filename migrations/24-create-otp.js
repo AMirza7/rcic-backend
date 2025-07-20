@@ -1,4 +1,3 @@
-// migrations/XXXXXXXXXXXXXX-create-otps.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -43,7 +42,7 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.fn('NOW'),
-      }
+      },
     });
   },
 

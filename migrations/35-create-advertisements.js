@@ -6,86 +6,89 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       advertiserId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       title: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(150),
+        allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.TEXT,
+        allowNull: false,
       },
       content: {
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: false,
       },
       images: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       logo: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       businessName: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(100),
+        allowNull: false,
       },
       contactEmail: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(255),
+        allowNull: false,
       },
       contactPhone: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(20),
+        allowNull: false,
       },
       website: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       targetAudience: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       placement: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       startDate: {
-        type: Sequelize.DATE,
-        allowNull: false
+        type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       endDate: {
-        type: Sequelize.DATE,
-        allowNull: false
+        type: Sequelize.DATEONLY,
+        allowNull: true,
       },
       timezone: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(50),
+        allowNull: false,
       },
       isActive: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
       tier: {
         type: Sequelize.ENUM('basic', 'premium', 'enterprise'),
-        allowNull: false
+        allowNull: false,
+        defaultValue: 'basic',
       },
       pricing: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       analytics: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
+        defaultValue: {},
       },
       status: {
         type: Sequelize.ENUM(
@@ -96,42 +99,54 @@ module.exports = {
           'paused',
           'expired'
         ),
-        allowNull: false
+        allowNull: false,
+        defaultValue: 'draft',
       },
       reviewNotes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       reviewedBy: {
         type: Sequelize.UUID,
-        allowNull: true
+        allowNull: true,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'SET NULL',
       },
       reviewedAt: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       variants: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
+        defaultValue: {},
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
   async down(queryInterface) {
     await queryInterface.dropTable('Advertisements');
-  }
+
+    // Clean up Postgres enum types
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Advertisements_tier";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Advertisements_status";'
+    );
+  },
 };

@@ -1,4 +1,3 @@
-// migrations/20250719000006-create-time-entries.js
 'use strict';
 
 module.exports = {
@@ -7,94 +6,130 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       timesheetId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Timesheets', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+      },
+      employeeId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'CASCADE',
+      },
+      consultantId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'SET NULL',
       },
       date: {
-        type: Sequelize.DATE,
-        allowNull: false
+        type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       startTime: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.TIME,
+        allowNull: false,
       },
       endTime: {
+        type: Sequelize.TIME,
+        allowNull: false,
+      },
+      totalHours: {
+        type: Sequelize.DECIMAL(5, 2),
+        allowNull: false,
+      },
+      clientName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
-      breakDuration: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      hoursWorked: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      entryType: {
-        type: Sequelize.ENUM('regular','overtime','vacation','sick','holiday','training'),
-        allowNull: false
-      },
-      taskDescription: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      clientId: {
-        type: Sequelize.UUID,
+      projectType: {
+        type: Sequelize.STRING(100),
         allowNull: true,
-        references: { model: 'Clients', key: 'id' },
-        onDelete: 'SET NULL'
       },
-      projectId: {
-        type: Sequelize.STRING,
-        allowNull: true
+      taskCategory: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
       },
-      billable: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
-      },
-      hourlyRate: {
-        type: Sequelize.DECIMAL,
-        allowNull: true
-      },
-      location: {
-        type: Sequelize.ENUM('office','remote','client_site','other'),
-        allowNull: false
-      },
-      approved: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: false,
       },
       notes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
-      gpsLocation: {
-        type: Sequelize.JSONB,
-        allowNull: true
+      status: {
+        type: Sequelize.ENUM(
+          'submitted',
+          'approved',
+          'rejected',
+          'consultant_approved'
+        ),
+        allowNull: false,
+        defaultValue: 'submitted',
       },
-      deviceInfo: {
-        type: Sequelize.JSONB,
-        allowNull: true
+      rejectionReason: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      hourlyRate: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+      },
+      totalAmount: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+      },
+      submittedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
+      consultantReviewedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      adminReviewedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      payrollStatus: {
+        type: Sequelize.ENUM('pending', 'processed', 'paid'),
+        allowNull: false,
+        defaultValue: 'pending',
+      },
+      payrollBatch: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // Drop the table
     await queryInterface.dropTable('TimeEntries');
-  }
+
+    // Clean up ENUM types (Postgres)
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_TimeEntries_status";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_TimeEntries_payrollStatus";'
+    );
+  },
 };

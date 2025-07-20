@@ -6,67 +6,82 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       userId: {
         type: Sequelize.UUID,
-        allowNull: false
+        allowNull: false,
       },
       userType: {
         type: Sequelize.ENUM('client', 'consultant'),
-        allowNull: false
+        allowNull: false,
       },
       amount: {
-        type: Sequelize.DECIMAL,
-        allowNull: false
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
       },
       status: {
         type: Sequelize.ENUM('requested', 'processing', 'paid', 'rejected'),
         allowNull: false,
-        defaultValue: 'requested'
+        defaultValue: 'requested',
       },
       requestedAt: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       processedAt: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       processedBy: {
         type: Sequelize.UUID,
-        allowNull: true
+        allowNull: true,
       },
       paymentMethod: {
         type: Sequelize.ENUM('bank_transfer', 'paypal', 'check'),
-        allowNull: true
+        allowNull: true,
       },
       notes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       rejectionReason: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
+
+      // Standard timestamps
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('WithdrawalRequests');
+
+    // Clean up Postgres enum types
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_WithdrawalRequests_userType";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_WithdrawalRequests_status";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_WithdrawalRequests_paymentMethod";'
+    );
   }
 };

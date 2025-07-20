@@ -10,9 +10,9 @@ module.exports = {
     await queryInterface.createTable('QRConnectors', {
       id: {
         type: Sequelize.UUID,
-        primaryKey: true,
         allowNull: false,
         defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        primaryKey: true,
       },
       consultantId: {
         type: Sequelize.UUID,
@@ -34,6 +34,8 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
+
+      // Timestamps
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -47,7 +49,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('QRConnectors');
   },
 };

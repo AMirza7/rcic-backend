@@ -6,49 +6,50 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       userId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       provider: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       credentials: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       enabled: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
       settings: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Integrations');
-  }
+  },
 };

@@ -6,44 +6,45 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       userId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       widgetType: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       config: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       position: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       size: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 

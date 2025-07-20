@@ -2,14 +2,10 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Ensure UUID generation extension is enabled
-    await queryInterface.sequelize.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
-
-    // Create DocumentPermissions table
-    await queryInterface.createTable('DocumentPermissions', {
+    await queryInterface.createTable('DocumentAnalysisResults', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
@@ -17,30 +13,17 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Documents', key: 'id' },
-        onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
       userId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' },
-        onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      canView: {
-        type: Sequelize.BOOLEAN,
+      analysis: {
+        type: Sequelize.JSONB,
         allowNull: false,
-        defaultValue: false,
-      },
-      canEdit: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      canDelete: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -56,6 +39,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('DocumentPermissions');
-  },
+    await queryInterface.dropTable('DocumentAnalysisResults');
+  }
 };

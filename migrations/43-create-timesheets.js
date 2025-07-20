@@ -1,4 +1,3 @@
-// migrations/20250719000005-create-timesheets.js
 'use strict';
 
 module.exports = {
@@ -7,98 +6,105 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       employeeId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Employees', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       consultantId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Consultants', key: 'id' },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       payPeriodStart: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       payPeriodEnd: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('draft','submitted','approved','rejected','paid'),
+        type: Sequelize.ENUM('draft', 'submitted', 'approved', 'rejected', 'paid'),
         allowNull: false,
-        defaultValue: 'draft'
+        defaultValue: 'draft',
       },
       totalHours: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: false,
       },
       submittedAt: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       submittedBy: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'SET NULL'
+        onDelete: 'SET NULL',
       },
       approvedAt: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       approvedBy: {
         type: Sequelize.UUID,
         allowNull: true,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'SET NULL'
+        onDelete: 'SET NULL',
       },
       rejectedAt: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       rejectionReason: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       notes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       payrollProcessed: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       payrollRecordId: {
         type: Sequelize.UUID,
         allowNull: true,
         references: { model: 'PayrollRecords', key: 'id' },
-        onDelete: 'SET NULL'
+        onDelete: 'SET NULL',
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // Drop the table
     await queryInterface.dropTable('Timesheets');
-  }
+
+    // Clean up the status enum type
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Timesheets_status";'
+    );
+  },
 };

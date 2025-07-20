@@ -2,56 +2,63 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+    // Ensure UUID generator is available
+    await queryInterface.sequelize.query(
+      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+    );
+
+    // Create the FileUploadConfigs table
     await queryInterface.createTable('FileUploadConfigs', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('uuid_generate_v4()'),
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
       },
       maxFileSize: {
         type: Sequelize.BIGINT,
-        allowNull: false
+        allowNull: false,
       },
       allowedTypes: {
         type: Sequelize.JSONB,
         allowNull: false,
-        defaultValue: []
+        defaultValue: [],
       },
       uploadUrl: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       compressionEnabled: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       virusScanning: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       retentionPeriod: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: 0,
       },
+
+      // Standard timestamps
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('FileUploadConfigs');
-  }
+  },
 };

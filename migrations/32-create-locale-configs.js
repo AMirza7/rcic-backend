@@ -2,43 +2,46 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+    // Ensure the UUID extension is available
+    await queryInterface.sequelize.query(
+      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+    );
 
     await queryInterface.createTable('LocaleConfigs', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('uuid_generate_v4()'),
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
       },
       code: {
         type: Sequelize.STRING(10),
-        allowNull: false
+        allowNull: false,
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       nativeName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       flag: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       rtl: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       dateFormat: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       timeFormat: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       currencyFormat: {
         type: Sequelize.JSONB,
@@ -47,31 +50,31 @@ module.exports = {
           symbol: '$',
           position: 'before',
           decimal: '.',
-          thousands: ','
-        }
+          thousands: ',',
+        },
       },
       numberFormat: {
         type: Sequelize.JSONB,
         allowNull: false,
         defaultValue: {
           decimal: '.',
-          thousands: ','
-        }
+          thousands: ',',
+        },
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
   async down(queryInterface) {
     await queryInterface.dropTable('LocaleConfigs');
-  }
+  },
 };

@@ -6,48 +6,49 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       userId: {
         type: Sequelize.UUID,
         allowNull: true,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'SET NULL'
+        onDelete: 'SET NULL',
       },
       eventType: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       eventData: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       ipAddress: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       userAgent: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       riskScore: {
         type: Sequelize.FLOAT,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
   async down(queryInterface) {
     await queryInterface.dropTable('SecurityEvents');
-  }
+  },
 };

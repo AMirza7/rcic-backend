@@ -6,72 +6,103 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
-        primaryKey: true
+        allowNull: false,
+        primaryKey: true,
       },
       referrerId: {
         type: Sequelize.UUID,
-        allowNull: false
+        allowNull: false,
       },
       referrerType: {
         type: Sequelize.ENUM('client', 'consultant'),
-        allowNull: false
+        allowNull: false,
       },
       referralCode: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       phone: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       invitedAt: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       status: {
         type: Sequelize.ENUM('pending', 'signed_up', 'reward_claimed'),
         allowNull: false,
-        defaultValue: 'pending'
+        defaultValue: 'pending',
       },
       planSubscribed: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       rewardAmount: {
-        type: Sequelize.DECIMAL,
-        allowNull: true
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: true,
       },
       rewardStatus: {
         type: Sequelize.ENUM('pending', 'paid', 'cancelled'),
-        allowNull: true
+        allowNull: true,
+      },
+      impressionCount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      clickCount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      conversionRate: {
+        type: Sequelize.DECIMAL(5, 2),
+        allowNull: false,
+        defaultValue: 0.00,
+      },
+      lastReferredAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       metadata: {
         type: Sequelize.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
 
   async down(queryInterface) {
     await queryInterface.dropTable('ReferralData');
+
+    // Clean up Postgres enum types
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_ReferralData_referrerType";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_ReferralData_status";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_ReferralData_rewardStatus";'
+    );
   }
 };

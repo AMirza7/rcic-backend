@@ -3,6 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // 1) Create the table
     await queryInterface.createTable('PlanFeatures', {
       id: {
         type: Sequelize.UUID,
@@ -41,9 +42,26 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // 2) Ensure each featureName is unique per plan
+    await queryInterface.addConstraint('PlanFeatures', {
+      fields: ['planId', 'featureName'],
+      type: 'unique',
+      name: 'uq_plan_features_plan_featureName'
+    });
+
+    // 3) Index isEnabled for quick filtering
+    await queryInterface.addIndex('PlanFeatures', ['isEnabled'], {
+      name: 'idx_plan_features_isEnabled'
+    });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // 1) Remove index on isEnabled
+    await queryInterface.removeIndex('PlanFeatures', 'idx_plan_features_isEnabled');
+    // 2) Remove unique constraint
+    await queryInterface.removeConstraint('PlanFeatures', 'uq_plan_features_plan_featureName');
+    // 3) Drop the table
     await queryInterface.dropTable('PlanFeatures');
   }
 };

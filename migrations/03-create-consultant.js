@@ -1,3 +1,4 @@
+// migrations/03-create-consultant.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -79,9 +80,17 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // Index the userId FK for faster lookups
+    await queryInterface.addIndex('Consultants', ['userId'], {
+      name: 'idx_consultants_userId'
+    });
   },
 
   async down(queryInterface, Sequelize) {
+    // Remove the index by name
+    await queryInterface.removeIndex('Consultants', 'idx_consultants_userId');
+    // Then drop the table
     await queryInterface.dropTable('Consultants');
   }
 };

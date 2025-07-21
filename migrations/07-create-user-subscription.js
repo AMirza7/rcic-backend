@@ -33,7 +33,7 @@ module.exports = {
         allowNull: false,
       },
       amount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
       currency: {
@@ -41,7 +41,7 @@ module.exports = {
         allowNull: false,
       },
       nextBilling: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       cancelledAt: {
@@ -49,7 +49,7 @@ module.exports = {
         allowNull: true,
       },
       periodEnd: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       features: {

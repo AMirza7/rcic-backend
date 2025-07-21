@@ -4,7 +4,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     // Ensure the uuid-ossp extension is available (Postgres)
     await queryInterface.sequelize.query(
-      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+      `CREATE EXTENSION IF NOT EXISTS "pgcrypto"";`
     );
 
     // Create the Otps table with the desired columns

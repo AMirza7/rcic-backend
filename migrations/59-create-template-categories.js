@@ -3,6 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // 1) Create the table with self‑reference for nested categories
     await queryInterface.createTable('TemplateCategories', {
       id: {
         type: Sequelize.UUID,
@@ -18,6 +19,10 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: false,
         unique: true,
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
       parentCategoryId: {
         type: Sequelize.UUID,
@@ -42,9 +47,26 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // 2) Ensure category names are unique
+    await queryInterface.addConstraint('TemplateCategories', {
+      fields: ['name'],
+      type: 'unique',
+      name: 'uq_template_categories_name'
+    });
+
+    // 3) Index parentCategoryId for faster hierarchical queries
+    await queryInterface.addIndex('TemplateCategories', ['parentCategoryId'], {
+      name: 'idx_template_categories_parent'
+    });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // 1) Remove index on parentCategoryId
+    await queryInterface.removeIndex('TemplateCategories', 'idx_template_categories_parent');
+    // 2) Remove unique constraint on name
+    await queryInterface.removeConstraint('TemplateCategories', 'uq_template_categories_name');
+    // 3) Drop the table (this also drops the slug unique index)
     await queryInterface.dropTable('TemplateCategories');
   }
 };

@@ -4,7 +4,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     // Enable UUID generation
     await queryInterface.sequelize.query(
-      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+      `CREATE EXTENSION IF NOT EXISTS "pgcrypto";`
     );
 
     // Create the TranslationKeys table

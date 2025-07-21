@@ -32,7 +32,7 @@ module.exports = {
         allowNull: true,
       },
       riskScore: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       createdAt: {

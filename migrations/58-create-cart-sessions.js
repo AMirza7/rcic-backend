@@ -10,15 +10,23 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      sessionId: {
+      token: {
         type: Sequelize.STRING(128),
         allowNull: false,
         unique: true,
       },
+      // optional link to a user if they log in
+      userId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { table: 'Users', field: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
       cartItems: {
         type: Sequelize.JSONB,
         allowNull: false,
-        defaultValue: [],
+        defaultValue: Sequelize.literal(`'[]'::jsonb`),
       },
       expiresAt: {
         type: Sequelize.DATE,
@@ -35,9 +43,15 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // index for cleanup by expiration
+    await queryInterface.addIndex('CartSessions', ['expiresAt'], {
+      name: 'idx_cart_sessions_expiresAt'
+    });
   },
 
   async down(queryInterface) {
+    await queryInterface.removeIndex('CartSessions', 'idx_cart_sessions_expiresAt');
     await queryInterface.dropTable('CartSessions');
   }
 };

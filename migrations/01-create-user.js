@@ -1,7 +1,9 @@
+// migrations/01-create-user.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // 1) Create the Users table
     await queryInterface.createTable('Users', {
       // Primary key as UUID
       id: {
@@ -22,6 +24,10 @@ module.exports = {
         allowNull: false,
       },
       mobileNumber: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      phone: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -64,10 +70,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       address: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -98,9 +100,39 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // 2) Add performance indexes
+    // email unique index (unique constraint already creates one, but listed for clarity)
+    await queryInterface.addIndex('Users', ['email'], {
+      name: 'idx_users_email',
+      unique: true
+    });
+    await queryInterface.addIndex('Users', ['role'], {
+      name: 'idx_users_role'
+    });
+    await queryInterface.addIndex('Users', ['phone'], {
+      name: 'idx_users_phone'
+    });
+    await queryInterface.addIndex('Users', ['firstName'], {
+      name: 'idx_users_firstName'
+    });
+    await queryInterface.addIndex('Users', ['lastName'], {
+      name: 'idx_users_lastName'
+    });
+    // If you add consultantId in the future:
+    // await queryInterface.addIndex('Users', ['consultantId'], { name: 'idx_users_consultant_id' });
   },
 
   async down(queryInterface, Sequelize) {
+    // 1) Remove indexes
+    await queryInterface.removeIndex('Users', 'idx_users_lastName');
+    await queryInterface.removeIndex('Users', 'idx_users_firstName');
+    await queryInterface.removeIndex('Users', 'idx_users_phone');
+    await queryInterface.removeIndex('Users', 'idx_users_role');
+    await queryInterface.removeIndex('Users', 'idx_users_email');
+    // await queryInterface.removeIndex('Users', 'idx_users_consultant_id');
+
+    // 2) Drop the Users table
     await queryInterface.dropTable('Users');
   },
 };

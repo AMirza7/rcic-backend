@@ -80,9 +80,23 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // Add indexes
+    await queryInterface.addIndex('Notifications', ['userId'], {
+      name: 'idx_notifications_user_id'
+    });
+    await queryInterface.addIndex('Notifications', ['userId', 'isRead'], {
+      name: 'idx_notifications_unread',
+      where: { isRead: false }
+    });
   },
 
   async down(queryInterface, Sequelize) {
+    // Remove indexes by name
+    await queryInterface.removeIndex('Notifications', 'idx_notifications_unread');
+    await queryInterface.removeIndex('Notifications', 'idx_notifications_user_id');
+
+    // Drop the table
     await queryInterface.dropTable('Notifications');
   },
 };

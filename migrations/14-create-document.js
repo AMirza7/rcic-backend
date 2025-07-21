@@ -1,3 +1,4 @@
+// migrations/14-create-document.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -40,7 +41,7 @@ module.exports = {
       // Foreign key to Users (uploader)
       uploadedBy: {
         type: Sequelize.UUID,
-        allowNull: false,
+        allowNull: true,               // ← make nullable if using SET NULL
         references: { model: 'Users', key: 'id' },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
@@ -112,9 +113,19 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // Indexes
+    await queryInterface.addIndex('Documents', ['clientId'],     { name: 'idx_documents_client_id' });
+    await queryInterface.addIndex('Documents', ['consultantId'], { name: 'idx_documents_consultant_id' });
+    await queryInterface.addIndex('Documents', ['uploadDate'],    { name: 'idx_documents_upload_date' });
   },
 
   async down(queryInterface, Sequelize) {
+    // Remove indexes by name
+    await queryInterface.removeIndex('Documents', 'idx_documents_upload_date');
+    await queryInterface.removeIndex('Documents', 'idx_documents_consultant_id');
+    await queryInterface.removeIndex('Documents', 'idx_documents_client_id');
+
     await queryInterface.dropTable('Documents');
   },
 };

@@ -22,11 +22,11 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       payPeriodStart: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       payPeriodEnd: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       status: {
@@ -49,7 +49,7 @@ module.exports = {
         onDelete: 'SET NULL',
       },
       approvedAt: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       approvedBy: {

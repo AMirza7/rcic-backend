@@ -28,7 +28,7 @@ module.exports = {
         allowNull: true,
       },
       price: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       currency: {
@@ -49,7 +49,7 @@ module.exports = {
         defaultValue: 0,
       },
       rating: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
         defaultValue: 0.0,
       },

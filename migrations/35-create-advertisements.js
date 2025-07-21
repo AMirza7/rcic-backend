@@ -60,11 +60,11 @@ module.exports = {
         allowNull: false,
       },
       startDate: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       endDate: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: true,
       },
       timezone: {
@@ -146,7 +146,7 @@ module.exports = {
         defaultValue: false,
       },
       promotionEndDate: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: true,
       },
 

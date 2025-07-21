@@ -45,7 +45,7 @@ module.exports = {
       },
 
       hireDate: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       salary: {
@@ -102,9 +102,19 @@ module.exports = {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
     });
+
+    await queryInterface.addIndex('Employees',    ['userId'],       { name: 'idx_employees_userId' });
+    await queryInterface.addIndex('Employees',    ['consultantId'], { name: 'idx_employees_consultantId' });
+    await queryInterface.addIndex('Employees',    ['employeeId'],   { name: 'idx_employees_managerId' });
+
   },
 
   async down(queryInterface, Sequelize) {
+
+    await queryInterface.removeIndex('Employees', 'idx_employees_userId');
+    await queryInterface.removeIndex('Employees', 'idx_employees_consultantId');
+    await queryInterface.removeIndex('Employees', 'idx_employees_managerId');
+
     // Remove self‑FK first
     await queryInterface.removeConstraint('Employees', 'fk_employees_manager');
     // Then drop the table

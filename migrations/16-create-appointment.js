@@ -1,17 +1,16 @@
+// migrations/16-create-appointment.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // 1) Create the Appointments table
     await queryInterface.createTable('Appointments', {
-      // Primary key as UUID
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-
-      // Foreign keys
       consultantId: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -26,8 +25,6 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       },
-
-      // Appointment details
       title: {
         type: Sequelize.STRING(150),
         allowNull: false,
@@ -36,15 +33,11 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-
-      // Appointment type (advance vs walk‑in)
       type: {
         type: Sequelize.ENUM('walk-in', 'advance'),
         allowNull: false,
         defaultValue: 'advance',
       },
-
-      // Status with full set of states
       status: {
         type: Sequelize.ENUM(
           'pending',
@@ -59,8 +52,6 @@ module.exports = {
         allowNull: false,
         defaultValue: 'pending',
       },
-
-      // Timing
       startTime: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -74,8 +65,6 @@ module.exports = {
         allowNull: false,
         comment: 'Duration in minutes',
       },
-
-      // Location & Virtual meeting
       address: {
         type: Sequelize.TEXT,
         allowNull: true,
@@ -89,15 +78,11 @@ module.exports = {
         allowNull: false,
         defaultValue: 'in-person',
       },
-
-      // Priority (low/medium/high)
       priority: {
         type: Sequelize.ENUM('low', 'medium', 'high'),
         allowNull: false,
         defaultValue: 'medium',
       },
-
-      // Financials
       amount: {
         type: Sequelize.DECIMAL(12, 2),
         allowNull: true,
@@ -112,8 +97,6 @@ module.exports = {
         allowNull: true,
         defaultValue: 'pending',
       },
-
-      // Misc
       notes: {
         type: Sequelize.TEXT,
         allowNull: true,
@@ -139,8 +122,6 @@ module.exports = {
         type: Sequelize.STRING(254),
         allowNull: false,
       },
-
-      // Timestamps
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -152,13 +133,33 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
-  }, // end up
+
+    // 2) Add performance indexes
+    await queryInterface.addIndex('Appointments', ['consultantId'], {
+      name: 'idx_appointments_consultant_id'
+    });
+    await queryInterface.addIndex('Appointments', ['clientId'], {
+      name: 'idx_appointments_client_id'
+    });
+    await queryInterface.addIndex('Appointments', ['startTime'], {
+      name: 'idx_appointments_date'
+    });
+    await queryInterface.addIndex('Appointments', ['status'], {
+      name: 'idx_appointments_status'
+    });
+  },
 
   async down(queryInterface, Sequelize) {
-    // Drop table first
+    // 1) Remove indexes
+    await queryInterface.removeIndex('Appointments', 'idx_appointments_status');
+    await queryInterface.removeIndex('Appointments', 'idx_appointments_date');
+    await queryInterface.removeIndex('Appointments', 'idx_appointments_client_id');
+    await queryInterface.removeIndex('Appointments', 'idx_appointments_consultant_id');
+
+    // 2) Drop the table
     await queryInterface.dropTable('Appointments');
 
-    // Clean up ENUM types in Postgres
+    // 3) Cleanup ENUM types (Postgres only)
     await queryInterface.sequelize.query(
       'DROP TYPE IF EXISTS "enum_Appointments_type";'
     );

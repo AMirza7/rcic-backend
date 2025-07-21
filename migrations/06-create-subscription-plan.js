@@ -34,11 +34,11 @@ module.exports = {
 
       // Pricing
       price: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
       yearlyPrice: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
       currency: {

@@ -18,7 +18,7 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
       date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       status: {
@@ -65,7 +65,7 @@ module.exports = {
         allowNull: false,
       },
       processedAt: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       status: {

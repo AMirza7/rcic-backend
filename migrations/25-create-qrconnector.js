@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     // ensure extension for UUIDs (Postgres)
     await queryInterface.sequelize.query(
-      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+      `CREATE EXTENSION IF NOT EXISTS "pgcrypto";`
     );
 
     await queryInterface.createTable('QRConnectors', {

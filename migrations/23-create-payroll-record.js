@@ -22,29 +22,29 @@ module.exports = {
 
       // Payroll period
       payPeriodStart: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       payPeriodEnd: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
 
       // Hours & pay details
       hoursWorked: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
       regularHours: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       overtimeHours: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       grossPay: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
       deductions: {
@@ -52,11 +52,11 @@ module.exports = {
         allowNull: true,
       },
       netPay: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
       paymentDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
 

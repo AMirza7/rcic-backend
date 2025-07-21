@@ -1,3 +1,4 @@
+// migrations/20250720-create-conversations.js
 'use strict';
 
 module.exports = {
@@ -13,6 +14,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      isGroup: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      lastMessageAt: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -24,9 +34,15 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW')
       }
     });
+
+    // Index for sorting by recent activity
+    await queryInterface.addIndex('Conversations', ['lastMessageAt'], {
+      name: 'idx_conversations_lastMessageAt'
+    });
   },
 
   async down(queryInterface) {
+    await queryInterface.removeIndex('Conversations', 'idx_conversations_lastMessageAt');
     await queryInterface.dropTable('Conversations');
   }
 };

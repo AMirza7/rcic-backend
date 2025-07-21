@@ -3,6 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // 1) Create the table
     await queryInterface.createTable('QRScanHistory', {
       id: {
         type: Sequelize.UUID,
@@ -48,9 +49,24 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // 2) Index qrConnectorId for quick lookups
+    await queryInterface.addIndex('QRScanHistory', ['qrConnectorId'], {
+      name: 'idx_qrscanhistory_connector'
+    });
+
+    // 3) Index scannedAt for time‑based queries
+    await queryInterface.addIndex('QRScanHistory', ['scannedAt'], {
+      name: 'idx_qrscanhistory_scannedAt'
+    });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // 1) Remove indexes
+    await queryInterface.removeIndex('QRScanHistory', 'idx_qrscanhistory_connector');
+    await queryInterface.removeIndex('QRScanHistory', 'idx_qrscanhistory_scannedAt');
+
+    // 2) Drop the table
     await queryInterface.dropTable('QRScanHistory');
   }
 };

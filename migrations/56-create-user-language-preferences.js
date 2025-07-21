@@ -1,8 +1,9 @@
-// migrations/20250720-create-user-language-preferences.js
+// migrations/56-create-user-language-preferences.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // 1) Create the table with ENUM for allowed languages
     await queryInterface.createTable('UserLanguagePreferences', {
       id: {
         type: Sequelize.UUID,
@@ -18,8 +19,9 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
       language: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.ENUM('EN', 'FR', 'HI'),
         allowNull: false,
+        defaultValue: 'EN',
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -32,9 +34,21 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // 2) Ensure one preference per user
+    await queryInterface.addConstraint('UserLanguagePreferences', {
+      fields: ['userId'],
+      type: 'unique',
+      name: 'uq_user_language_preference_user'
+    });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
+    // 1) Remove unique constraint
+    await queryInterface.removeConstraint('UserLanguagePreferences', 'uq_user_language_preference_user');
+    // 2) Drop the table
     await queryInterface.dropTable('UserLanguagePreferences');
+    // 3) Drop the ENUM type (Postgres only)
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_UserLanguagePreferences_language";');
   }
 };

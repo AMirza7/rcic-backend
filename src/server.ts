@@ -1,10 +1,19 @@
 // src/server.ts
 import app from './app';
+import http from 'http';
+import { sequelize } from './models';
 
-const port = Number(process.env.PORT) || 5100;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+const server = http.createServer(app);
+sequelize.sync().then(() => {
+  server.listen(process.env.PORT || 5100, () =>
+    console.log('Server running')
+  );
 });
+
+// const port = Number(process.env.PORT) || 5100;
+// app.listen(port, () => {
+//   console.log(`Server listening on port ${port}`);
+// });
 
 
 // import dotenv from 'dotenv';

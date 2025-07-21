@@ -13,12 +13,12 @@ export interface TimeEntryAttributes {
   employeeId: string;
   consultantId: string;
   date: Date;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   totalHours: number;
   clientName: string;
-  projectType: string;
-  taskCategory: string;
+  projectType?: string;
+  taskCategory?: string;
   description: string;
   notes?: string;
   status: 'submitted' | 'approved' | 'rejected' | 'consultant_approved';
@@ -43,6 +43,8 @@ export interface TimeEntryCreationAttributes
     | 'consultantReviewedAt'
     | 'adminReviewedAt'
     | 'payrollBatch'
+    | 'projectType'
+    | 'taskCategory'
     | 'createdAt'
     | 'updatedAt'
   > {}
@@ -54,12 +56,12 @@ export class TimeEntry
   public employeeId!: string;
   public consultantId!: string;
   public date!: Date;
-  public startTime!: Date;
-  public endTime!: Date;
+  public startTime!: string;
+  public endTime!: string;
   public totalHours!: number;
   public clientName!: string;
-  public projectType!: string;
-  public taskCategory!: string;
+  public projectType?: string;
+  public taskCategory?: string;
   public description!: string;
   public notes?: string;
   public status!: TimeEntryAttributes['status'];
@@ -80,54 +82,55 @@ export class TimeEntry
       {
         id: {
           type: DataTypes.UUID,
-          defaultValue: DataTypes.UUIDV4,
-          primaryKey: true
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
+          allowNull: false,
+          primaryKey: true,
         },
         employeeId: {
           type: DataTypes.UUID,
           allowNull: false,
-          references: { model: 'Users', key: 'id' }
+          references: { model: 'Users', key: 'id' },
         },
         consultantId: {
           type: DataTypes.UUID,
           allowNull: false,
-          references: { model: 'Users', key: 'id' }
+          references: { model: 'Users', key: 'id' },
         },
         date: {
           type: DataTypes.DATEONLY,
-          allowNull: false
+          allowNull: false,
         },
         startTime: {
           type: DataTypes.TIME,
-          allowNull: false
+          allowNull: false,
         },
         endTime: {
           type: DataTypes.TIME,
-          allowNull: false
+          allowNull: false,
         },
         totalHours: {
-          type: DataTypes.DECIMAL,
-          allowNull: false
+          type: DataTypes.DECIMAL(5, 2),
+          allowNull: false,
         },
         clientName: {
           type: DataTypes.STRING,
-          allowNull: false
+          allowNull: false,
         },
         projectType: {
-          type: DataTypes.STRING,
-          allowNull: false
+          type: DataTypes.STRING(100),
+          allowNull: true,
         },
         taskCategory: {
-          type: DataTypes.STRING,
-          allowNull: false
+          type: DataTypes.STRING(100),
+          allowNull: true,
         },
         description: {
           type: DataTypes.TEXT,
-          allowNull: false
+          allowNull: false,
         },
         notes: {
           type: DataTypes.TEXT,
-          allowNull: true
+          allowNull: true,
         },
         status: {
           type: DataTypes.ENUM(
@@ -137,47 +140,47 @@ export class TimeEntry
             'consultant_approved'
           ),
           allowNull: false,
-          defaultValue: 'submitted'
+          defaultValue: 'submitted',
         },
         rejectionReason: {
           type: DataTypes.TEXT,
-          allowNull: true
+          allowNull: true,
         },
         hourlyRate: {
-          type: DataTypes.DECIMAL,
-          allowNull: false
+          type: DataTypes.DECIMAL(12, 2),
+          allowNull: false,
         },
         totalAmount: {
-          type: DataTypes.DECIMAL,
-          allowNull: false
+          type: DataTypes.DECIMAL(12, 2),
+          allowNull: false,
         },
         submittedAt: {
           type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
         consultantReviewedAt: {
           type: DataTypes.DATE,
-          allowNull: true
+          allowNull: true,
         },
         adminReviewedAt: {
           type: DataTypes.DATE,
-          allowNull: true
+          allowNull: true,
         },
         payrollStatus: {
           type: DataTypes.ENUM('pending', 'processed', 'paid'),
           allowNull: false,
-          defaultValue: 'pending'
+          defaultValue: 'pending',
         },
         payrollBatch: {
-          type: DataTypes.STRING,
-          allowNull: true
-        }
+          type: DataTypes.STRING(50),
+          allowNull: true,
+        },
       },
       {
         sequelize,
         tableName: 'TimeEntries',
-        timestamps: true
+        timestamps: true,
       }
     );
   }

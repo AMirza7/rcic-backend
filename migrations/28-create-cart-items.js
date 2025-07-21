@@ -1,30 +1,25 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Ensure UUID generator is available
-    await queryInterface.sequelize.query(
-      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
-    );
-
     await queryInterface.createTable('CartItems', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
       cartId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'ShoppingCarts', key: 'id' },
+        references: { table: 'ShoppingCarts', field: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
       templateId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'Templates', key: 'id' },
+        references: { table: 'Templates', field: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT',
       },
@@ -33,7 +28,7 @@ module.exports = {
         allowNull: false,
       },
       currency: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(3),
         allowNull: false,
       },
       quantity: {
@@ -50,8 +45,6 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
-
-      // Standard timestamps
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -67,5 +60,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('CartItems');
-  }
+  },
 };

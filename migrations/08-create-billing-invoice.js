@@ -20,40 +20,46 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
 
+      // Invoice amount in smallest currency unit (e.g. dollars.cents)
       amount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: false,
       },
+      // ISO currency code
       currency: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(3),
         allowNull: false,
       },
+      // Invoice status
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM('pending', 'paid', 'overdue'),
         allowNull: false,
+        defaultValue: 'pending',
       },
+
       billingDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       periodStart: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       periodEnd: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       dueDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       paidAt: {
         type: Sequelize.DATE,
         allowNull: true,
       },
+
       planName: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       downloadUrl: {
@@ -61,8 +67,9 @@ module.exports = {
         allowNull: true,
       },
       items: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true,
+        defaultValue: [],
       },
 
       // Timestamps
@@ -80,6 +87,11 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
+    // Drop table
     await queryInterface.dropTable('BillingInvoices');
+    // Clean up ENUM type
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_BillingInvoices_status";'
+    );
   },
 };

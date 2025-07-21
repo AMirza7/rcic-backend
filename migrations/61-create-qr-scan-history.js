@@ -1,33 +1,41 @@
+// migrations/20250720-create-qr-scan-history.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('InvoiceItems', {
+    await queryInterface.createTable('QRScanHistory', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      invoiceId: {
+      qrConnectorId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'BillingInvoices', key: 'id' },
-        onUpdate: 'CASCADE',
+        references: { table: 'QRConnectors', field: 'id' },
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
-      description: {
-        type: Sequelize.STRING,
-        allowNull: false,
+      scannerId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { table: 'Users', field: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
-      amount: {
-        type: Sequelize.DECIMAL(12, 2),
+      scannedAt: {
+        type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
+      result: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      metadata: {
+        type: Sequelize.JSONB,
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,6 +51,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('InvoiceItems');
-  },
+    await queryInterface.dropTable('QRScanHistory');
+  }
 };

@@ -11,68 +11,60 @@ module.exports = {
         primaryKey: true,
       },
 
-      // Foreign key to Users
+      // Foreign keys created without constraints initially
       userId: {
         type: Sequelize.UUID,
-        allowNull: false,
-        references: { model: 'Users', key: 'id' },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        allowNull: true,
       },
-
-      // Foreign key to Consultants
       consultantId: {
         type: Sequelize.UUID,
-        allowNull: false,
-        references: { model: 'Consultants', key: 'id' },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        allowNull: true,
       },
 
       firstName: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       lastName: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
 
       caseType: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: true,
       },
       caseStatus: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: true,
       },
       priority: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: true,
       },
 
       dateOfBirth: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       nationality: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: true,
       },
       passportNumber: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: true,
       },
       passportExpiry: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       visaStatus: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: true,
       },
       applicationNumber: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: true,
       },
 
@@ -106,9 +98,32 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    // Add FK constraints after related tables exist
+    await queryInterface.addConstraint('Clients', {
+      fields: ['userId'],
+      type: 'foreign key',
+      name: 'fk_clients_userId',
+      references: { table: 'Users', field: 'id' },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    });
+
+    await queryInterface.addConstraint('Clients', {
+      fields: ['consultantId'],
+      type: 'foreign key',
+      name: 'fk_clients_consultantId',
+      references: { table: 'Consultants', field: 'id' },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    });
   },
 
   async down(queryInterface, Sequelize) {
+    // Remove FK constraints first
+    await queryInterface.removeConstraint('Clients', 'fk_clients_userId');
+    await queryInterface.removeConstraint('Clients', 'fk_clients_consultantId');
+    // Then drop the table
     await queryInterface.dropTable('Clients');
   }
 };

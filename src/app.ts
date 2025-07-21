@@ -26,6 +26,7 @@ import consultantRouter from './routes/consultant';
 import contentRouter from './routes/content';
 import documentRouter from './routes/document';
 import documentFolderRouter from './routes/documentFolder';
+import conversationRoutes from './routes/conversation';
 import employeeRouter from './routes/employee';
 import cartItems from './routes/cartItems';
 import timesheetsRouter from './routes/timesheets';
@@ -67,7 +68,7 @@ import userRouter from './routes/user';
 import userSubscriptionRouter from './routes/userSubscription';
 import adsRouter from './routes/ads';
 
-const app = express();
+export const app = express();
 
 // Serve OpenAPI spec and Swagger UI
 app.get('/api/docs.json', (_req, res) => res.json(swaggerSpec));
@@ -117,7 +118,9 @@ app.use('/api/integrations',                      integrationRouter);
 app.use('/api/storage-usage',                    storageUsage);
 app.use('/api/audit-logs',     requireAuth, auditLogsRouter);
 app.use('/api/security-events', requireAuth, securityEventsRouter);
+app.use('/api/conversations', requireAuth, conversationRoutes);
 app.use('/api/payslips',          requireAuth, payslipRouter);
+app.use("/api/conversations", requireAuth, conversationRoutes);
 app.use('/api/payroll-records',    requireAuth, payrollRecordRouter);
 app.use('/api/consultant/referral', consultantReferralRouter);
 app.use('/api/calendars',       requireAuth, calendarsRouter);
@@ -135,5 +138,6 @@ app.use('/api/ads',                              adsRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);
+
 
 export default app;

@@ -1,33 +1,30 @@
+// migrations/20250720-create-user-theme-preferences.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('InvoiceItems', {
+    await queryInterface.createTable('UserThemePreferences', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      invoiceId: {
+      userId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'BillingInvoices', key: 'id' },
-        onUpdate: 'CASCADE',
+        references: { table: 'Users', field: 'id' },
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
-      description: {
-        type: Sequelize.STRING,
+      theme: {
+        type: Sequelize.ENUM('light', 'dark', 'system', 'novaedge'),
         allowNull: false,
+        defaultValue: 'light',
       },
-      amount: {
-        type: Sequelize.DECIMAL(12, 2),
-        allowNull: false,
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
+      customCSS: {
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,6 +40,9 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('InvoiceItems');
-  },
+    await queryInterface.dropTable('UserThemePreferences');
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_UserThemePreferences_theme";'
+    );
+  }
 };

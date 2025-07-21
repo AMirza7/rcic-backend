@@ -11,7 +11,7 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         allowNull: false,
-        defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        defaultValue: Sequelize.literal('gen_random_uuid()'),
         primaryKey: true,
       },
       consultantId: {

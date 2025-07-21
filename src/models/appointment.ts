@@ -13,6 +13,7 @@ export interface AppointmentAttributes {
   title: string;
   description?: string;
   type: 'walk-in' | 'advance';
+  address?: string;
   status: string;
   startTime: Date;
   endTime: Date;
@@ -47,6 +48,7 @@ export interface AppointmentCreationAttributes
     | 'paymentStatus'
     | 'notes'
     | 'attendees'
+    | 'address'
     | 'documents'
     | 'createdAt'
     | 'updatedAt'
@@ -63,6 +65,7 @@ export class Appointment
   public title!: string;
   public description?: string;
   public type!: 'walk-in' | 'advance';
+  public address?: string;
   public status!: string;
   public startTime!: Date;
   public endTime!: Date;
@@ -119,6 +122,10 @@ export class Appointment
           type: DataTypes.ENUM('walk-in', 'advance'),
           allowNull: false,
           defaultValue: 'advance'
+        },
+        address: {
+          type: DataTypes.STRING,
+          allowNull: true,
         },
         status: {
           type: DataTypes.STRING,

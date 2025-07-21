@@ -1,33 +1,34 @@
+// migrations/20250720-create-plan-features.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('InvoiceItems', {
+    await queryInterface.createTable('PlanFeatures', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      invoiceId: {
+      planId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'BillingInvoices', key: 'id' },
-        onUpdate: 'CASCADE',
+        references: { table: 'SubscriptionPlans', field: 'id' },
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      },
+      featureName: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
-      amount: {
-        type: Sequelize.DECIMAL(12, 2),
+      isEnabled: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
+        defaultValue: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,6 +44,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('InvoiceItems');
-  },
+    await queryInterface.dropTable('PlanFeatures');
+  }
 };

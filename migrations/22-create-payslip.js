@@ -20,6 +20,21 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
 
+      // Monetary fields with explicit precision
+      grossPay: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+      },
+      taxDeducted: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+      },
+      netPay: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+      },
+
+      // File format & URL
       format: {
         type: Sequelize.STRING,
         allowNull: false,

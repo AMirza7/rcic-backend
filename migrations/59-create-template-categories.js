@@ -1,33 +1,35 @@
+// migrations/20250720-create-template-categories.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('InvoiceItems', {
+    await queryInterface.createTable('TemplateCategories', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      invoiceId: {
+      name: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
+      slug: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+        unique: true,
+      },
+      parentCategoryId: {
         type: Sequelize.UUID,
-        allowNull: false,
-        references: { model: 'BillingInvoices', key: 'id' },
+        allowNull: true,
+        references: { table: 'TemplateCategories', field: 'id' },
+        onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      description: {
-        type: Sequelize.STRING,
+      isActive: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-      },
-      amount: {
-        type: Sequelize.DECIMAL(12, 2),
-        allowNull: false,
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
+        defaultValue: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,6 +45,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('InvoiceItems');
-  },
+    await queryInterface.dropTable('TemplateCategories');
+  }
 };

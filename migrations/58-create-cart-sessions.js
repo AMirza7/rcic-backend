@@ -1,33 +1,28 @@
+// migrations/20250720-create-cart-sessions.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('InvoiceItems', {
+    await queryInterface.createTable('CartSessions', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      invoiceId: {
-        type: Sequelize.UUID,
+      sessionId: {
+        type: Sequelize.STRING(128),
         allowNull: false,
-        references: { model: 'BillingInvoices', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        unique: true,
       },
-      description: {
-        type: Sequelize.STRING,
+      cartItems: {
+        type: Sequelize.JSONB,
         allowNull: false,
+        defaultValue: [],
       },
-      amount: {
-        type: Sequelize.DECIMAL(12, 2),
+      expiresAt: {
+        type: Sequelize.DATE,
         allowNull: false,
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,6 +38,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('InvoiceItems');
-  },
+    await queryInterface.dropTable('CartSessions');
+  }
 };

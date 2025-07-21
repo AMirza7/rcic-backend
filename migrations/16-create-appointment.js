@@ -1,5 +1,5 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Appointments', {
@@ -17,12 +17,14 @@ module.exports = {
         allowNull: false,
         references: { model: 'Consultants', key: 'id' },
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       clientId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'Clients', key: 'id' },
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
 
       // Appointment details
@@ -88,7 +90,7 @@ module.exports = {
         defaultValue: 'in-person',
       },
 
-      // Priority (could be low/medium/high per UI)
+      // Priority (low/medium/high)
       priority: {
         type: Sequelize.ENUM('low', 'medium', 'high'),
         allowNull: false,
@@ -142,25 +144,35 @@ module.exports = {
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
+        defaultValue: Sequelize.fn('NOW'),
       },
     });
-  },  // <- comma here to separate up/down
+  }, // end up
 
   async down(queryInterface, Sequelize) {
     // Drop table first
     await queryInterface.dropTable('Appointments');
 
     // Clean up ENUM types in Postgres
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Appointments_type";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Appointments_status";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Appointments_mode";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Appointments_priority";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Appointments_paymentStatus";');
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Appointments_type";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Appointments_status";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Appointments_mode";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Appointments_priority";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Appointments_paymentStatus";'
+    );
   },
 };

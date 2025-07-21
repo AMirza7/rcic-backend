@@ -1,6 +1,6 @@
 // src/controllers/messageController.ts
 import { Request, Response } from 'express';
-import { Message, MessageCreationAttributes } from '../models/message';  // ← direct, named import
+import { Message, MessageCreationAttributes } from '../models/Message';
 
 export const getAllMessages = async (_req: Request, res: Response) => {
   try {
@@ -28,24 +28,23 @@ export const getMessageById = async (req: Request, res: Response) => {
 
 export const createMessage = async (req: Request, res: Response) => {
   try {
-    const { senderId, recipientId, content, timestamp } = req.body as {
+    const { senderId, recipientId, content, timestamp, conversationId } = req.body as {
       senderId: string;
       recipientId: string;
       content: string;
       timestamp: string;
+      conversationId: string;
     };
 
-    // Build a POJO
-    const obj = {
+    const payload: MessageCreationAttributes = {
       senderId,
       recipientId,
       content,
       timestamp: new Date(timestamp),
+      conversationId,
     };
 
-    // Cast it so TS knows it matches your model's creation interface
-    const newMsg = await Message.create(obj as MessageCreationAttributes);
-
+    const newMsg = await Message.create(payload);
     return res.status(201).json(newMsg);
   } catch (error) {
     console.error('createMessage error:', error);
@@ -53,15 +52,27 @@ export const createMessage = async (req: Request, res: Response) => {
   }
 };
 
-
 export const updateMessage = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const payload = req.body;
-    const [updatedCount] = await Message.update(payload, { where: { id } });
+    const { senderId, recipientId, content, timestamp } = req.body as {
+      senderId?: string;
+      recipientId?: string;
+      content?: string;
+      timestamp?: string;
+    };
+
+    const updatePayload: Partial<MessageCreationAttributes> = {};
+    if (senderId) updatePayload.senderId = senderId;
+    if (recipientId) updatePayload.recipientId = recipientId;
+    if (content) updatePayload.content = content;
+    if (timestamp) updatePayload.timestamp = new Date(timestamp);
+
+    const [updatedCount] = await Message.update(updatePayload, { where: { id } });
     if (updatedCount === 0) {
       return res.status(404).json({ message: 'Message not found' });
     }
+
     const updatedMsg = await Message.findByPk(id);
     return res.json(updatedMsg);
   } catch (error) {

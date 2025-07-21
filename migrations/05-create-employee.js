@@ -20,14 +20,10 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
 
-      // (Optional) self‑reference or external employee identifier
+      // (Optional) manager or mentor in the same table
       employeeId: {
         type: Sequelize.UUID,
         allowNull: true,
-        // If this links to another employee record (e.g., manager), you could enable:
-        // references: { model: 'Employees', key: 'id' },
-        // onDelete: 'SET NULL',
-        // onUpdate: 'CASCADE'
       },
 
       // Consultant relationship
@@ -40,42 +36,44 @@ module.exports = {
       },
 
       position: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       department: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: true,
       },
 
       hireDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       salary: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       hourlyRate: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       employmentType: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: true,
       },
+
+      // Consider making this an ENUM if you have fixed statuses
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(20),
         allowNull: false,
         defaultValue: 'active',
       },
 
       permissions: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true,
       },
       workSchedule: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true,
       },
 
@@ -90,10 +88,26 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.fn('NOW'),
       },
-    }); // end createTable
+    });
+
+    // Add self‑referential FK for employeeId → Employees.id
+    await queryInterface.addConstraint('Employees', {
+      fields: ['employeeId'],
+      type: 'foreign key',
+      name: 'fk_employees_manager',
+      references: {
+        table: 'Employees',
+        field: 'id',
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    });
   },
 
   async down(queryInterface, Sequelize) {
+    // Remove self‑FK first
+    await queryInterface.removeConstraint('Employees', 'fk_employees_manager');
+    // Then drop the table
     await queryInterface.dropTable('Employees');
   },
 };

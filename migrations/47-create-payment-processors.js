@@ -1,5 +1,5 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('PaymentProcessors', {
@@ -10,16 +10,18 @@ module.exports = {
         primaryKey: true,
       },
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       provider: {
         type: Sequelize.ENUM('stripe', 'paypal', 'other'),
         allowNull: false,
+        defaultValue: 'stripe',
       },
       credentials: {
         type: Sequelize.JSONB,
         allowNull: false,
+        defaultValue: {},
       },
       enabled: {
         type: Sequelize.BOOLEAN,
@@ -29,9 +31,22 @@ module.exports = {
       settings: {
         type: Sequelize.JSONB,
         allowNull: true,
+        defaultValue: {},
       },
       metadata: {
         type: Sequelize.JSONB,
+        allowNull: true,
+        defaultValue: {},
+      },
+
+      // ——— New fee fields, converted from FLOAT to DECIMAL ———
+      feePercent: {
+        type: Sequelize.DECIMAL(5,2),
+        allowNull: false,
+        defaultValue: 0.00,
+      },
+      transactionFee: {
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
 

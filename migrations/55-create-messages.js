@@ -1,33 +1,33 @@
 'use strict';
-/** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('InvoiceItems', {
+    await queryInterface.createTable('Messages', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      invoiceId: {
+      senderId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'BillingInvoices', key: 'id' },
-        onUpdate: 'CASCADE',
+        references: { model: 'Users', key: 'id' },
         onDelete: 'CASCADE',
       },
-      description: {
-        type: Sequelize.STRING,
+      recipientId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'CASCADE',
+      },
+      content: {
+        type: Sequelize.TEXT,
         allowNull: false,
       },
-      amount: {
-        type: Sequelize.DECIMAL(12, 2),
+      timestamp: {
+        type: Sequelize.DATE,
         allowNull: false,
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -42,7 +42,7 @@ module.exports = {
     });
   },
 
-  async down(queryInterface) {
-    await queryInterface.dropTable('InvoiceItems');
-  },
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('Messages');
+  }
 };

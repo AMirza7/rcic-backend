@@ -22,7 +22,16 @@ import { DocumentFolder } from './documentfolder';
 import { DocumentPermission } from './documentpermission';
 import { WithdrawalRequest } from './WithdrawalRequest';
 import { Appointment } from './appointment';
+import { Conversation } from './Conversation';
+import { ConversationParticipant } from './ConversationParticipant';
+import { UserLanguagePreference } from './UserLanguagePreference';
+import { UserThemePreference } from './UserThemePreference';
+import { CartSession } from './CartSession';
+import { Message } from './Message';
+import { TemplateCategory } from './TemplateCategory';
+import { PlanFeature } from './PlanFeature';
 import { AppointmentFeedback } from './appointmentfeedback';
+import { QRScanHistory } from './QRScanHistory';
 import { Timesheet } from './Timesheet';
 import { DashboardWidget } from './DashboardWidget';
 import { Integration } from './Integration';
@@ -39,6 +48,7 @@ import { TemplateReview } from './templatereview';
 import { SecurityEvent } from './SecurityEvent';
 import { ShoppingCart } from './shoppingcart';
 import { PayrollRun } from './payrollrun';
+import { PayrollBatch } from './payrollrun';
 import { Payslip } from './payslip';
 import { PayrollRecord } from './payrollrecord';
 import { BillingInvoice } from './billinginvoice';
@@ -91,13 +101,22 @@ export function initModels(): void {
   PaymentProcessor.initialize(sequelize);
   BrandingSettings.initialize(sequelize);
   SecurityEvent.initialize(sequelize);
+  Message.initModel(sequelize);
   Content.initialize(sequelize);
   Document.initialize(sequelize);
   TaskWorkflow.initialize(sequelize);
   WorkflowStep.initialize(sequelize);
   DocumentFolder.initialize(sequelize);
   DocumentPermission.initialize(sequelize);
+  QRScanHistory.initModel(sequelize);
   Timesheet.initialize(sequelize);
+  UserLanguagePreference.initModel(sequelize);
+  Conversation.initModel(sequelize);
+  ConversationParticipant.initModel(sequelize);
+  UserThemePreference.initModel(sequelize);
+  CartSession.initModel(sequelize);
+  TemplateCategory.initModel(sequelize);
+  PlanFeature.initModel(sequelize);
   TimeEntry.initialize(sequelize);  
   Calendar.initialize(sequelize);
   CalendarEvent.initialize(sequelize);
@@ -110,6 +129,7 @@ export function initModels(): void {
   ShoppingCart.initialize(sequelize);
   CartItem.initialize(sequelize);
   PayrollRun.initialize(sequelize);
+  PayrollBatch.initialize(sequelize);
   WithdrawalRequest.initialize(sequelize);
   Payslip.initialize(sequelize);
   BillingInvoice.initialize(sequelize);
@@ -130,9 +150,12 @@ export function initModels(): void {
   TimeEntry.associate(sequelize.models);
   Calendar.associate(sequelize.models);
   CalendarEvent.associate(sequelize.models);
+  Appointment.associate(sequelize.models);
   DashboardWidget.associate(sequelize.models);
   Integration.associate(sequelize.models);
   ReferralStats.associate(sequelize.models);
+  PayrollRun.associate(sequelize.models);
+  PayrollBatch.associate(sequelize.models);
 
   // Run associate() on each model, if defined
   Object.values(sequelize.models).forEach((model: any) => {

@@ -17,11 +17,16 @@ module.exports = {
       'enum_Appointments_priority',
       'enum_Appointments_paymentStatus',
 
+      // 20-create-shopping-cart.js
+      'enum_ShoppingCarts_status',
+
       // 21-create-payroll-run.js
       'enum_PayrollRuns_status',
       'enum_PayrollRuns_paymentMethod',
 
       // 23-create-payroll-record.js
+      'enum_PayrollRecords_employerType',
+      'enum_PayrollRecords_approverRole',
       'enum_PayrollRecords_status',
 
       // 26-create-connection-requests.js
@@ -61,14 +66,19 @@ module.exports = {
       'enum_EnhancedChatMessages_role',
       'enum_EnhancedChatMessages_sentiment',
 
-      // 56-create-user-language-preferences.js
-      'enum_UserLanguagePreferences_language',
 
       // 57-create-user-theme-preferences.js
       'enum_UserThemePreferences_theme',
 
       // 63-create-conversation-participants.js
-      'enum_ConversationParticipants_role'
+      'enum_ConversationParticipants_role',
+
+      // 65-create-timesheet-approvals.js
+      'enum_TimesheetApprovals_approverRole',
+      'enum_TimesheetApprovals_status',
+
+      // 68-create-branding-approval-workflows.js
+      'enum_BrandingApprovalWorkflows_status'
     ];
 
     for (const name of enumNames) {

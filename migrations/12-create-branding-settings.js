@@ -20,6 +20,7 @@ module.exports = {
         onUpdate: 'CASCADE',
       },
 
+      // Branding assets
       logo: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -57,13 +58,35 @@ module.exports = {
         allowNull: true,
       },
 
+      // Validation and integrations
+      domainValidated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      sslCertificateId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { model: 'SSLCertificates', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
+      emailConfigId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { model: 'EmailConfigs', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
+
+      // Active state and theme config
       isActive: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
       theme: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true,
       },
 

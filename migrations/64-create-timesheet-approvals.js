@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('CartItems', {
+    await queryInterface.createTable('TimesheetApprovals', {
       // Primary key as UUID
       id: {
         type: Sequelize.UUID,
@@ -11,51 +11,38 @@ module.exports = {
         primaryKey: true,
       },
 
-      // Link to ShoppingCarts
-      cartId: {
+      // FK to Timesheets
+      timesheetId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'ShoppingCarts', key: 'id' },
-        onUpdate: 'CASCADE',
+        references: { model: 'Timesheets', key: 'id' },
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
 
-      // Link to Templates
-      templateId: {
+      // Who approved (user id)
+      approverId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'Templates', key: 'id' },
+        references: { model: 'Employees', key: 'id' }, // or 'Users' if appropriate
+        onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
       },
 
-      // Line‑item pricing
-      price: {
-        type: Sequelize.DECIMAL(12, 2),
-        allowNull: false,
-      },
-      currency: {
-        type: Sequelize.STRING(3),
+      // Role of the approver (admin or consultant)
+      approverRole: {
+        type: Sequelize.ENUM('admin', 'consultant'),
         allowNull: false,
       },
 
-      // Quantity
-      quantity: {
-        type: Sequelize.INTEGER,
+      // Approval status
+      status: {
+        type: Sequelize.ENUM('pending', 'approved', 'rejected'),
         allowNull: false,
-        defaultValue: 1,
+        defaultValue: 'pending',
       },
 
       // Timestamps
-      addedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
-      },
-      expiresAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -70,6 +57,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('CartItems');
+    // Drop table and associated enums
+    await queryInterface.dropTable('TimesheetApprovals');
   },
 };

@@ -1,14 +1,8 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Enable pgcrypto extension for gen_random_uuid()
-    await queryInterface.sequelize.query(
-      `CREATE EXTENSION IF NOT EXISTS "pgcrypto";`
-    );
-
-    // Create the TranslationKeys table
-    await queryInterface.createTable('TranslationKeys', {
+    await queryInterface.createTable('Orders', {
       // Primary key as UUID
       id: {
         type: Sequelize.UUID,
@@ -17,23 +11,26 @@ module.exports = {
         primaryKey: true,
       },
 
-      // Locale code, defaulting to 'en'
-      locale: {
-        type: Sequelize.STRING(10),
+      // Link back to the cart
+      cartId: {
+        type: Sequelize.UUID,
         allowNull: false,
-        defaultValue: 'en',
+        references: { model: 'ShoppingCarts', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
 
-      // Translation key name
-      key: {
+      // Order total
+      total: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+      },
+
+      // Payment status (free‑form string, e.g. 'pending','paid','failed')
+      paymentStatus: {
         type: Sequelize.STRING,
         allowNull: false,
-      },
-
-      // Translated text value
-      value: {
-        type: Sequelize.TEXT,
-        allowNull: false,
+        defaultValue: 'pending',
       },
 
       // Timestamps
@@ -51,7 +48,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Drop the TranslationKeys table
-    await queryInterface.dropTable('TranslationKeys');
+    await queryInterface.dropTable('Orders');
   },
 };

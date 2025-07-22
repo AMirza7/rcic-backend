@@ -48,7 +48,7 @@ module.exports = {
         allowNull: false,
       },
       deductions: {
-        type: Sequelize.JSONB,
+        type: Sequelize.DECIMAL(12,2),
         allowNull: true,
       },
       netPay: {
@@ -58,6 +58,26 @@ module.exports = {
       paymentDate: {
         type: Sequelize.DATEONLY,
         allowNull: false,
+      },
+
+      // Role-based employer tracking
+      employerType: {
+        type: Sequelize.ENUM('admin','consultant'),
+        allowNull: false,
+      },
+      employerId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+      },
+
+      // Approval tracking
+      approverRole: {
+        type: Sequelize.ENUM('admin','consultant'),
+        allowNull: true,
+      },
+      approverId: {
+        type: Sequelize.UUID,
+        allowNull: true,
       },
 
       // Record status & link
@@ -86,7 +106,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Drop the table
     await queryInterface.dropTable('PayrollRecords');
   },
 };

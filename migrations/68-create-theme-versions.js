@@ -2,57 +2,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('CartItems', {
-      // Primary key as UUID
+    await queryInterface.createTable('ThemeVersions', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-
-      // Link to ShoppingCarts
-      cartId: {
+      brandingSettingId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'ShoppingCarts', key: 'id' },
-        onUpdate: 'CASCADE',
+        references: { model: 'BrandingSettings', key: 'id' },
         onDelete: 'CASCADE',
-      },
-
-      // Link to Templates
-      templateId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: { model: 'Templates', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
       },
-
-      // Line‑item pricing
-      price: {
-        type: Sequelize.DECIMAL(12, 2),
-        allowNull: false,
-      },
-      currency: {
-        type: Sequelize.STRING(3),
-        allowNull: false,
-      },
-
-      // Quantity
-      quantity: {
+      versionNumber: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 1,
       },
-
-      // Timestamps
-      addedAt: {
-        type: Sequelize.DATE,
+      config: {
+        type: Sequelize.JSONB,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
       },
-      expiresAt: {
+      activatedAt: {
         type: Sequelize.DATE,
         allowNull: true,
       },
@@ -70,6 +42,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('CartItems');
+    await queryInterface.dropTable('ThemeVersions');
   },
 };

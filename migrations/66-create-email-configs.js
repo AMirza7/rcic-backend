@@ -1,42 +1,34 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Enable pgcrypto extension for gen_random_uuid()
-    await queryInterface.sequelize.query(
-      `CREATE EXTENSION IF NOT EXISTS "pgcrypto";`
-    );
-
-    // Create the TranslationKeys table
-    await queryInterface.createTable('TranslationKeys', {
-      // Primary key as UUID
+    await queryInterface.createTable('EmailConfigs', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-
-      // Locale code, defaulting to 'en'
-      locale: {
-        type: Sequelize.STRING(10),
-        allowNull: false,
-        defaultValue: 'en',
-      },
-
-      // Translation key name
-      key: {
+      smtpHost: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-
-      // Translated text value
-      value: {
-        type: Sequelize.TEXT,
+      port: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-
-      // Timestamps
+      user: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      pass: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      fromAddress: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -51,7 +43,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Drop the TranslationKeys table
-    await queryInterface.dropTable('TranslationKeys');
+    await queryInterface.dropTable('EmailConfigs');
   },
 };

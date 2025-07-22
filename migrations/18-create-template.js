@@ -19,9 +19,15 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      category: {
-        type: Sequelize.STRING,
+      categoryId: {
+        type: Sequelize.UUID,
         allowNull: true,
+        references: {
+          model: 'TemplateCategories',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       subcategory: {
         type: Sequelize.STRING,

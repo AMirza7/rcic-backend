@@ -35,7 +35,7 @@ module.exports = {
         defaultValue: 'draft',
       },
       totalHours: {
-        type: Sequelize.JSONB,
+        type: Sequelize.DECIMAL(5, 2),
         allowNull: false,
       },
       submittedAt: {

@@ -41,8 +41,8 @@ module.exports = {
         defaultValue: false,
       },
       language: {
-        type: Sequelize.STRING,
-        allowNull: true,
+        type: Sequelize.STRING(10),
+        allowNull: false,
         defaultValue: 'en',
       },
 
@@ -84,7 +84,7 @@ module.exports = {
         defaultValue: 'UTC',
       },
       preferences: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true,
       },
 
@@ -102,25 +102,22 @@ module.exports = {
     });
 
     // 2) Add performance indexes
-    // email unique index (unique constraint already creates one, but listed for clarity)
     await queryInterface.addIndex('Users', ['email'], {
       name: 'idx_users_email',
-      unique: true
+      unique: true,
     });
     await queryInterface.addIndex('Users', ['role'], {
-      name: 'idx_users_role'
+      name: 'idx_users_role',
     });
     await queryInterface.addIndex('Users', ['phone'], {
-      name: 'idx_users_phone'
+      name: 'idx_users_phone',
     });
     await queryInterface.addIndex('Users', ['firstName'], {
-      name: 'idx_users_firstName'
+      name: 'idx_users_firstName',
     });
     await queryInterface.addIndex('Users', ['lastName'], {
-      name: 'idx_users_lastName'
+      name: 'idx_users_lastName',
     });
-    // If you add consultantId in the future:
-    // await queryInterface.addIndex('Users', ['consultantId'], { name: 'idx_users_consultant_id' });
   },
 
   async down(queryInterface, Sequelize) {
@@ -130,7 +127,6 @@ module.exports = {
     await queryInterface.removeIndex('Users', 'idx_users_phone');
     await queryInterface.removeIndex('Users', 'idx_users_role');
     await queryInterface.removeIndex('Users', 'idx_users_email');
-    // await queryInterface.removeIndex('Users', 'idx_users_consultant_id');
 
     // 2) Drop the Users table
     await queryInterface.dropTable('Users');

@@ -11,38 +11,34 @@ module.exports = {
         primaryKey: true,
       },
 
-      // Foreign key to Users
+      // Optional FK to Users (guest carts allowed)
       userId: {
         type: Sequelize.UUID,
-        allowNull: false,
+        allowNull: true,
         references: { model: 'Users', key: 'id' },
-        onDelete: 'CASCADE',
+        onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },
 
-      // Cart contents
-      items: {
-        type: Sequelize.JSONB,
+      // Cart status (active vs completed)
+      status: {
+        type: Sequelize.ENUM('active', 'completed'),
         allowNull: false,
-        defaultValue: [],
+        defaultValue: 'active',
       },
 
-      // Totals
-      totalAmount: {
-        type: Sequelize.DECIMAL(12, 2),
-        allowNull: false,
-        defaultValue: 0.0,
-      },
+      // Currency for prices
       currency: {
         type: Sequelize.STRING(3),
         allowNull: false,
         defaultValue: 'USD',
       },
 
-      // Expiry
-      expiresAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
+      // Total cart value
+      totalAmount: {
+        type: Sequelize.DECIMAL(12,2),
+        allowNull: false,
+        defaultValue: 0.00,
       },
 
       // Timestamps
@@ -60,6 +56,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
+    // Drop the table; ENUM cleanup is handled in your centralized drop-all-enums migration
     await queryInterface.dropTable('ShoppingCarts');
-  }
+  },
 };

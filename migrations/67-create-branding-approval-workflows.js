@@ -2,25 +2,38 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // 1) Create the table with a standardized language column
-    await queryInterface.createTable('UserLanguagePreferences', {
+    await queryInterface.createTable('BrandingApprovalWorkflows', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
         primaryKey: true,
       },
-      userId: {
+      brandingSettingId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'Users', key: 'id' },
+        references: { model: 'BrandingSettings', key: 'id' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       },
-      language: {
-        type: Sequelize.STRING(10),
+      requestedBy: {
+        type: Sequelize.UUID,
         allowNull: false,
-        defaultValue: 'en',
+        references: { model: 'Consultants', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
+      approvedBy: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { model: 'Consultants', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
+      status: {
+        type: Sequelize.ENUM('pending', 'approved', 'rejected'),
+        allowNull: false,
+        defaultValue: 'pending',
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -33,22 +46,9 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
-
-    // 2) Ensure one preference per user
-    await queryInterface.addConstraint('UserLanguagePreferences', {
-      fields: ['userId'],
-      type: 'unique',
-      name: 'uq_user_language_preference_user'
-    });
   },
 
   async down(queryInterface, Sequelize) {
-    // 1) Remove unique constraint
-    await queryInterface.removeConstraint(
-      'UserLanguagePreferences',
-      'uq_user_language_preference_user'
-    );
-    // 2) Drop the table
-    await queryInterface.dropTable('UserLanguagePreferences');
-  }
+    await queryInterface.dropTable('BrandingApprovalWorkflows');
+  },
 };

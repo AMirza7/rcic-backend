@@ -89,9 +89,5 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Drop table
     await queryInterface.dropTable('BillingInvoices');
-    // Clean up ENUM type
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_BillingInvoices_status";'
-    );
   },
 };

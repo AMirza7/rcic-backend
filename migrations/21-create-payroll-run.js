@@ -96,14 +96,6 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Drop PayrollBatches first (to avoid FK conflicts)
     await queryInterface.dropTable('PayrollBatches');
-    // Clean up ENUM types for PayrollBatches
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_PayrollBatches_status";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_PayrollBatches_paymentMethod";'
-    );
-
     // Then drop the original PayrollRuns table
     await queryInterface.dropTable('PayrollRuns');
     // No enums on PayrollRuns, so nothing else to drop

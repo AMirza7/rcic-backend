@@ -93,16 +93,5 @@ module.exports = {
 
   async down(queryInterface) {
     await queryInterface.dropTable('ReferralData');
-
-    // Clean up Postgres enum types
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_ReferralData_referrerType";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_ReferralData_status";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_ReferralData_rewardStatus";'
-    );
   }
 };

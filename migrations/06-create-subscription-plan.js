@@ -84,10 +84,5 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Drop the table
     await queryInterface.dropTable('SubscriptionPlans');
-
-    // Drop the billingInterval enum type
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_SubscriptionPlans_billingInterval";'
-    );
   },
 };

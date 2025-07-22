@@ -95,10 +95,5 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Drop the table
     await queryInterface.dropTable('BankAccounts');
-
-    // Clean up the enum type for accountType
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_BankAccounts_accountType";'
-    );
   },
 };

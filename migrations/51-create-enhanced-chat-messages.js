@@ -64,13 +64,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('EnhancedChatMessages');
-
-    // Clean up Postgres enum types
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_EnhancedChatMessages_role";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_EnhancedChatMessages_sentiment";'
-    );
   },
 };

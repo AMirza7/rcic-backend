@@ -53,10 +53,5 @@ module.exports = {
 
     // 2) Drop the table
     await queryInterface.dropTable('UserThemePreferences');
-
-    // 3) Drop the ENUM type (Postgres only)
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_UserThemePreferences_theme";'
-    );
   }
 };

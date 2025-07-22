@@ -123,13 +123,5 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Drop the table
     await queryInterface.dropTable('TimeEntries');
-
-    // Clean up ENUM types (Postgres)
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_TimeEntries_status";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_TimeEntries_payrollStatus";'
-    );
   },
 };

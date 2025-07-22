@@ -71,10 +71,5 @@ module.exports = {
 
     // 3) Drop the table
     await queryInterface.dropTable('ConversationParticipants');
-
-    // 4) Drop the ENUM type (Postgres only)
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_ConversationParticipants_role";'
-    );
   }
 };

@@ -72,16 +72,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('WithdrawalRequests');
-
-    // Clean up Postgres enum types
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_WithdrawalRequests_userType";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_WithdrawalRequests_status";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_WithdrawalRequests_paymentMethod";'
-    );
   }
 };

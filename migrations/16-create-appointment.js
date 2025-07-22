@@ -158,22 +158,5 @@ module.exports = {
 
     // 2) Drop the table
     await queryInterface.dropTable('Appointments');
-
-    // 3) Cleanup ENUM types (Postgres only)
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Appointments_type";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Appointments_status";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Appointments_mode";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Appointments_priority";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Appointments_paymentStatus";'
-    );
   },
 };

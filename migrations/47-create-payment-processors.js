@@ -67,10 +67,5 @@ module.exports = {
   async down(queryInterface) {
     // Drop the table
     await queryInterface.dropTable('PaymentProcessors');
-
-    // Clean up the provider enum type
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_PaymentProcessors_provider";'
-    );
   },
 };

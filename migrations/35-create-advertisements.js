@@ -176,13 +176,5 @@ module.exports = {
 
   async down(queryInterface) {
     await queryInterface.dropTable('Advertisements');
-
-    // Clean up Postgres enum types
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Advertisements_tier";'
-    );
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Advertisements_status";'
-    );
   },
 };

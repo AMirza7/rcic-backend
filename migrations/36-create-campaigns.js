@@ -86,10 +86,5 @@ module.exports = {
   async down(queryInterface) {
     // Drop the table
     await queryInterface.dropTable('Campaigns');
-
-    // Clean up the tier enum type
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_Campaigns_tier";'
-    );
   },
 };

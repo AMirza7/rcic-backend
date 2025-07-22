@@ -48,7 +48,5 @@ module.exports = {
     await queryInterface.removeConstraint('UserLanguagePreferences', 'uq_user_language_preference_user');
     // 2) Drop the table
     await queryInterface.dropTable('UserLanguagePreferences');
-    // 3) Drop the ENUM type (Postgres only)
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_UserLanguagePreferences_language";');
   }
 };

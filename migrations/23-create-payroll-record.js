@@ -88,10 +88,5 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Drop the table
     await queryInterface.dropTable('PayrollRecords');
-
-    // Clean up the status enum in Postgres
-    await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_PayrollRecords_status";'
-    );
   },
 };
